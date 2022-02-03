@@ -36,6 +36,64 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: "uint256",
+        name: "fee",
+        type: "uint256",
+      },
+    ],
+    name: "FeeChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
+    ],
+    name: "FeeReceiverChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "leverage",
+        type: "uint256",
+      },
+    ],
+    name: "MaxLeverageChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "mint",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "burn",
+        type: "uint256",
+      },
+    ],
+    name: "MintAndBurnFeesChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: false,
         internalType: "address",
         name: "_poolKeeper",
@@ -43,6 +101,19 @@ const _abi = [
       },
     ],
     name: "PoolKeeperChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "fee",
+        type: "uint256",
+      },
+    ],
+    name: "SecondaryFeeSplitChanged",
     type: "event",
   },
   {
@@ -86,7 +157,7 @@ const _abi = [
           },
           {
             internalType: "address",
-            name: "invariantCheckContract",
+            name: "invariantCheck",
             type: "address",
           },
         ],
@@ -96,19 +167,6 @@ const _abi = [
       },
     ],
     name: "deployPool",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getOwner",
     outputs: [
       {
         internalType: "address",
@@ -231,6 +289,19 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "address",
+        name: "_invariantCheck",
+        type: "address",
+      },
+    ],
+    name: "setInvariantCheck",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint16",
         name: "newMaxLeverage",
         type: "uint16",
@@ -253,8 +324,13 @@ const _abi = [
         name: "_burningFee",
         type: "uint256",
       },
+      {
+        internalType: "uint256",
+        name: "_changeInterval",
+        type: "uint256",
+      },
     ],
-    name: "setMintAndBurnFee",
+    name: "setMintAndBurnFeeAndChangeInterval",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

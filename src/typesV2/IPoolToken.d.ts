@@ -21,17 +21,17 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IPoolTokenInterface extends ethers.utils.Interface {
   functions: {
-    "burn(uint256,address)": FunctionFragment;
-    "mint(uint256,address)": FunctionFragment;
+    "burn(address,uint256)": FunctionFragment;
+    "mint(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "burn",
-    values: [BigNumberish, string]
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
-    values: [BigNumberish, string]
+    values: [string, BigNumberish]
   ): string;
 
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
@@ -85,70 +85,70 @@ export class IPoolToken extends BaseContract {
 
   functions: {
     burn(
-      amount: BigNumberish,
       account: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     mint(
-      amount: BigNumberish,
       account: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
   burn(
-    amount: BigNumberish,
     account: string,
+    amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   mint(
-    amount: BigNumberish,
     account: string,
+    amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
     burn(
-      amount: BigNumberish,
       account: string,
+      amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
     mint(
-      amount: BigNumberish,
       account: string,
+      amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
   };
 
   filters: {};
 
   estimateGas: {
     burn(
-      amount: BigNumberish,
       account: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     mint(
-      amount: BigNumberish,
       account: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     burn(
-      amount: BigNumberish,
       account: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     mint(
-      amount: BigNumberish,
       account: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

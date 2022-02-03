@@ -23,21 +23,19 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
   functions: {
     "autoClaim()": FunctionFragment;
     "burningFee()": FunctionFragment;
+    "changeInterval()": FunctionFragment;
     "deployPool(tuple)": FunctionFragment;
     "fee()": FunctionFragment;
     "feeReceiver()": FunctionFragment;
-    "getOwner()": FunctionFragment;
+    "invariantCheck()": FunctionFragment;
     "isValidPool(address)": FunctionFragment;
     "isValidPoolCommitter(address)": FunctionFragment;
     "maxLeverage()": FunctionFragment;
     "mintingFee()": FunctionFragment;
     "numPools()": FunctionFragment;
     "owner()": FunctionFragment;
-    "pairTokenBase()": FunctionFragment;
     "pairTokenBaseAddress()": FunctionFragment;
-    "poolBase()": FunctionFragment;
     "poolBaseAddress()": FunctionFragment;
-    "poolCommitterBase()": FunctionFragment;
     "poolCommitterBaseAddress()": FunctionFragment;
     "poolKeeper()": FunctionFragment;
     "pools(uint256)": FunctionFragment;
@@ -46,8 +44,9 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
     "setAutoClaim(address)": FunctionFragment;
     "setFee(uint256)": FunctionFragment;
     "setFeeReceiver(address)": FunctionFragment;
+    "setInvariantCheck(address)": FunctionFragment;
     "setMaxLeverage(uint16)": FunctionFragment;
-    "setMintAndBurnFee(uint256,uint256)": FunctionFragment;
+    "setMintAndBurnFeeAndChangeInterval(uint256,uint256,uint256)": FunctionFragment;
     "setPoolKeeper(address)": FunctionFragment;
     "setSecondaryFeeSplitPercent(uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
@@ -56,6 +55,10 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "autoClaim", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "burningFee",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "changeInterval",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -69,7 +72,7 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
         quoteToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheckContract: string;
+        invariantCheck: string;
       }
     ]
   ): string;
@@ -78,7 +81,10 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
     functionFragment: "feeReceiver",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "getOwner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "invariantCheck",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "isValidPool", values: [string]): string;
   encodeFunctionData(
     functionFragment: "isValidPoolCommitter",
@@ -95,20 +101,11 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "numPools", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "pairTokenBase",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "pairTokenBaseAddress",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "poolBase", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "poolBaseAddress",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "poolCommitterBase",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -141,12 +138,16 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "setInvariantCheck",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setMaxLeverage",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setMintAndBurnFee",
-    values: [BigNumberish, BigNumberish]
+    functionFragment: "setMintAndBurnFeeAndChangeInterval",
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setPoolKeeper",
@@ -163,13 +164,20 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "autoClaim", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burningFee", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "changeInterval",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "deployPool", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "fee", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "feeReceiver",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getOwner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "invariantCheck",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "isValidPool",
     data: BytesLike
@@ -186,20 +194,11 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "numPools", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "pairTokenBase",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "pairTokenBaseAddress",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "poolBase", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "poolBaseAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "poolCommitterBase",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -226,11 +225,15 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setInvariantCheck",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setMaxLeverage",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setMintAndBurnFee",
+    functionFragment: "setMintAndBurnFeeAndChangeInterval",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -248,13 +251,23 @@ interface PoolFactoryInterface extends ethers.utils.Interface {
 
   events: {
     "DeployPool(address,address,string)": EventFragment;
+    "FeeChanged(uint256)": EventFragment;
+    "FeeReceiverChanged(address)": EventFragment;
+    "MaxLeverageChanged(uint256)": EventFragment;
+    "MintAndBurnFeesChanged(uint256,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "PoolKeeperChanged(address)": EventFragment;
+    "SecondaryFeeSplitChanged(uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "DeployPool"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "FeeChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "FeeReceiverChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MaxLeverageChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MintAndBurnFeesChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolKeeperChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SecondaryFeeSplitChanged"): EventFragment;
 }
 
 export class PoolFactory extends BaseContract {
@@ -305,6 +318,8 @@ export class PoolFactory extends BaseContract {
 
     burningFee(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    changeInterval(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     deployPool(
       deploymentParameters: {
         poolName: string;
@@ -314,7 +329,7 @@ export class PoolFactory extends BaseContract {
         quoteToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheckContract: string;
+        invariantCheck: string;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -323,7 +338,7 @@ export class PoolFactory extends BaseContract {
 
     feeReceiver(overrides?: CallOverrides): Promise<[string]>;
 
-    getOwner(overrides?: CallOverrides): Promise<[string]>;
+    invariantCheck(overrides?: CallOverrides): Promise<[string]>;
 
     isValidPool(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
 
@@ -340,15 +355,9 @@ export class PoolFactory extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
-    pairTokenBase(overrides?: CallOverrides): Promise<[string]>;
-
     pairTokenBaseAddress(overrides?: CallOverrides): Promise<[string]>;
 
-    poolBase(overrides?: CallOverrides): Promise<[string]>;
-
     poolBaseAddress(overrides?: CallOverrides): Promise<[string]>;
-
-    poolCommitterBase(overrides?: CallOverrides): Promise<[string]>;
 
     poolCommitterBaseAddress(overrides?: CallOverrides): Promise<[string]>;
 
@@ -377,14 +386,20 @@ export class PoolFactory extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    setInvariantCheck(
+      _invariantCheck: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     setMaxLeverage(
       newMaxLeverage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setMintAndBurnFee(
+    setMintAndBurnFeeAndChangeInterval(
       _mintingFee: BigNumberish,
       _burningFee: BigNumberish,
+      _changeInterval: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -408,6 +423,8 @@ export class PoolFactory extends BaseContract {
 
   burningFee(overrides?: CallOverrides): Promise<BigNumber>;
 
+  changeInterval(overrides?: CallOverrides): Promise<BigNumber>;
+
   deployPool(
     deploymentParameters: {
       poolName: string;
@@ -417,7 +434,7 @@ export class PoolFactory extends BaseContract {
       quoteToken: string;
       oracleWrapper: string;
       settlementEthOracle: string;
-      invariantCheckContract: string;
+      invariantCheck: string;
     },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -426,7 +443,7 @@ export class PoolFactory extends BaseContract {
 
   feeReceiver(overrides?: CallOverrides): Promise<string>;
 
-  getOwner(overrides?: CallOverrides): Promise<string>;
+  invariantCheck(overrides?: CallOverrides): Promise<string>;
 
   isValidPool(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
@@ -443,15 +460,9 @@ export class PoolFactory extends BaseContract {
 
   owner(overrides?: CallOverrides): Promise<string>;
 
-  pairTokenBase(overrides?: CallOverrides): Promise<string>;
-
   pairTokenBaseAddress(overrides?: CallOverrides): Promise<string>;
 
-  poolBase(overrides?: CallOverrides): Promise<string>;
-
   poolBaseAddress(overrides?: CallOverrides): Promise<string>;
-
-  poolCommitterBase(overrides?: CallOverrides): Promise<string>;
 
   poolCommitterBaseAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -480,14 +491,20 @@ export class PoolFactory extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setInvariantCheck(
+    _invariantCheck: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   setMaxLeverage(
     newMaxLeverage: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setMintAndBurnFee(
+  setMintAndBurnFeeAndChangeInterval(
     _mintingFee: BigNumberish,
     _burningFee: BigNumberish,
+    _changeInterval: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -511,6 +528,8 @@ export class PoolFactory extends BaseContract {
 
     burningFee(overrides?: CallOverrides): Promise<BigNumber>;
 
+    changeInterval(overrides?: CallOverrides): Promise<BigNumber>;
+
     deployPool(
       deploymentParameters: {
         poolName: string;
@@ -520,7 +539,7 @@ export class PoolFactory extends BaseContract {
         quoteToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheckContract: string;
+        invariantCheck: string;
       },
       overrides?: CallOverrides
     ): Promise<string>;
@@ -529,7 +548,7 @@ export class PoolFactory extends BaseContract {
 
     feeReceiver(overrides?: CallOverrides): Promise<string>;
 
-    getOwner(overrides?: CallOverrides): Promise<string>;
+    invariantCheck(overrides?: CallOverrides): Promise<string>;
 
     isValidPool(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
@@ -546,15 +565,9 @@ export class PoolFactory extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<string>;
 
-    pairTokenBase(overrides?: CallOverrides): Promise<string>;
-
     pairTokenBaseAddress(overrides?: CallOverrides): Promise<string>;
 
-    poolBase(overrides?: CallOverrides): Promise<string>;
-
     poolBaseAddress(overrides?: CallOverrides): Promise<string>;
-
-    poolCommitterBase(overrides?: CallOverrides): Promise<string>;
 
     poolCommitterBaseAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -575,14 +588,20 @@ export class PoolFactory extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    setInvariantCheck(
+      _invariantCheck: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     setMaxLeverage(
       newMaxLeverage: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setMintAndBurnFee(
+    setMintAndBurnFeeAndChangeInterval(
       _mintingFee: BigNumberish,
       _burningFee: BigNumberish,
+      _changeInterval: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -612,6 +631,26 @@ export class PoolFactory extends BaseContract {
       { pool: string; poolCommitter: string; ticker: string }
     >;
 
+    FeeChanged(
+      fee?: BigNumberish | null
+    ): TypedEventFilter<[BigNumber], { fee: BigNumber }>;
+
+    FeeReceiverChanged(
+      receiver?: string | null
+    ): TypedEventFilter<[string], { receiver: string }>;
+
+    MaxLeverageChanged(
+      leverage?: BigNumberish | null
+    ): TypedEventFilter<[BigNumber], { leverage: BigNumber }>;
+
+    MintAndBurnFeesChanged(
+      mint?: BigNumberish | null,
+      burn?: BigNumberish | null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { mint: BigNumber; burn: BigNumber }
+    >;
+
     OwnershipTransferred(
       previousOwner?: string | null,
       newOwner?: string | null
@@ -623,12 +662,18 @@ export class PoolFactory extends BaseContract {
     PoolKeeperChanged(
       _poolKeeper?: null
     ): TypedEventFilter<[string], { _poolKeeper: string }>;
+
+    SecondaryFeeSplitChanged(
+      fee?: BigNumberish | null
+    ): TypedEventFilter<[BigNumber], { fee: BigNumber }>;
   };
 
   estimateGas: {
     autoClaim(overrides?: CallOverrides): Promise<BigNumber>;
 
     burningFee(overrides?: CallOverrides): Promise<BigNumber>;
+
+    changeInterval(overrides?: CallOverrides): Promise<BigNumber>;
 
     deployPool(
       deploymentParameters: {
@@ -639,7 +684,7 @@ export class PoolFactory extends BaseContract {
         quoteToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheckContract: string;
+        invariantCheck: string;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -648,7 +693,7 @@ export class PoolFactory extends BaseContract {
 
     feeReceiver(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getOwner(overrides?: CallOverrides): Promise<BigNumber>;
+    invariantCheck(overrides?: CallOverrides): Promise<BigNumber>;
 
     isValidPool(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -665,15 +710,9 @@ export class PoolFactory extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    pairTokenBase(overrides?: CallOverrides): Promise<BigNumber>;
-
     pairTokenBaseAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
-    poolBase(overrides?: CallOverrides): Promise<BigNumber>;
-
     poolBaseAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
-    poolCommitterBase(overrides?: CallOverrides): Promise<BigNumber>;
 
     poolCommitterBaseAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -702,14 +741,20 @@ export class PoolFactory extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    setInvariantCheck(
+      _invariantCheck: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     setMaxLeverage(
       newMaxLeverage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setMintAndBurnFee(
+    setMintAndBurnFeeAndChangeInterval(
       _mintingFee: BigNumberish,
       _burningFee: BigNumberish,
+      _changeInterval: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -734,6 +779,8 @@ export class PoolFactory extends BaseContract {
 
     burningFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    changeInterval(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     deployPool(
       deploymentParameters: {
         poolName: string;
@@ -743,7 +790,7 @@ export class PoolFactory extends BaseContract {
         quoteToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheckContract: string;
+        invariantCheck: string;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -752,7 +799,7 @@ export class PoolFactory extends BaseContract {
 
     feeReceiver(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    invariantCheck(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isValidPool(
       arg0: string,
@@ -772,17 +819,11 @@ export class PoolFactory extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    pairTokenBase(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     pairTokenBaseAddress(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    poolBase(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     poolBaseAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    poolCommitterBase(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     poolCommitterBaseAddress(
       overrides?: CallOverrides
@@ -818,14 +859,20 @@ export class PoolFactory extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    setInvariantCheck(
+      _invariantCheck: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     setMaxLeverage(
       newMaxLeverage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setMintAndBurnFee(
+    setMintAndBurnFeeAndChangeInterval(
       _mintingFee: BigNumberish,
       _burningFee: BigNumberish,
+      _changeInterval: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

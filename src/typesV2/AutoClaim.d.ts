@@ -355,17 +355,17 @@ export class AutoClaim extends BaseContract {
     >;
 
     PaidRequestExecution(
-      user?: null,
-      poolCommitter?: null,
-      reward?: null
+      user?: string | null,
+      poolCommitter?: string | null,
+      reward?: BigNumberish | null
     ): TypedEventFilter<
       [string, string, BigNumber],
       { user: string; poolCommitter: string; reward: BigNumber }
     >;
 
     RequestWithdrawn(
-      user?: null,
-      poolCommitter?: null
+      user?: string | null,
+      poolCommitter?: string | null
     ): TypedEventFilter<
       [string, string],
       { user: string; poolCommitter: string }

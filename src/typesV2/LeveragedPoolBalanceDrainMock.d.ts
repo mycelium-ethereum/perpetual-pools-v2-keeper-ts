@@ -52,7 +52,7 @@ interface LeveragedPoolBalanceDrainMockInterface
     "poolName()": FunctionFragment;
     "poolTokenTransfer(bool,address,uint256)": FunctionFragment;
     "poolTokens()": FunctionFragment;
-    "poolUpkeep(int256,int256)": FunctionFragment;
+    "poolUpkeep(int256,int256,bool,uint256)": FunctionFragment;
     "provisionalGovernance()": FunctionFragment;
     "quoteToken()": FunctionFragment;
     "quoteTokenTransfer(address,uint256)": FunctionFragment;
@@ -196,7 +196,7 @@ interface LeveragedPoolBalanceDrainMockInterface
   ): string;
   encodeFunctionData(
     functionFragment: "poolUpkeep",
-    values: [BigNumberish, BigNumberish]
+    values: [BigNumberish, BigNumberish, boolean, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "provisionalGovernance",
@@ -402,10 +402,12 @@ interface LeveragedPoolBalanceDrainMockInterface
     "GovernanceAddressChanged(address,address)": EventFragment;
     "KeeperAddressChanged(address,address)": EventFragment;
     "Paused()": EventFragment;
+    "PoolBalancesChanged(uint256,uint256)": EventFragment;
     "PoolInitialized(address,address,address,string)": EventFragment;
     "PoolRebalance(int256,int256,uint256,uint256)": EventFragment;
     "PriceChangeError(int256,int256)": EventFragment;
     "ProvisionalGovernanceChanged(address)": EventFragment;
+    "QuoteWithdrawn(address,uint256)": EventFragment;
     "SecondaryFeeAddressUpdated(address,address)": EventFragment;
     "Unpaused()": EventFragment;
   };
@@ -414,12 +416,14 @@ interface LeveragedPoolBalanceDrainMockInterface
   getEvent(nameOrSignatureOrTopic: "GovernanceAddressChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "KeeperAddressChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PoolBalancesChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolInitialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolRebalance"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PriceChangeError"): EventFragment;
   getEvent(
     nameOrSignatureOrTopic: "ProvisionalGovernanceChanged"
   ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "QuoteWithdrawn"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SecondaryFeeAddressUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
@@ -580,6 +584,8 @@ export class LeveragedPoolBalanceDrainMock extends BaseContract {
     poolUpkeep(
       _oldPrice: BigNumberish,
       _newPrice: BigNumberish,
+      _boundedIntervals: boolean,
+      _numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -759,6 +765,8 @@ export class LeveragedPoolBalanceDrainMock extends BaseContract {
   poolUpkeep(
     _oldPrice: BigNumberish,
     _newPrice: BigNumberish,
+    _boundedIntervals: boolean,
+    _numberOfIntervals: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -931,6 +939,8 @@ export class LeveragedPoolBalanceDrainMock extends BaseContract {
     poolUpkeep(
       _oldPrice: BigNumberish,
       _newPrice: BigNumberish,
+      _boundedIntervals: boolean,
+      _numberOfIntervals: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1015,6 +1025,14 @@ export class LeveragedPoolBalanceDrainMock extends BaseContract {
 
     Paused(): TypedEventFilter<[], {}>;
 
+    PoolBalancesChanged(
+      long?: BigNumberish | null,
+      short?: BigNumberish | null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { long: BigNumber; short: BigNumber }
+    >;
+
     PoolInitialized(
       longToken?: string | null,
       shortToken?: string | null,
@@ -1056,6 +1074,14 @@ export class LeveragedPoolBalanceDrainMock extends BaseContract {
     ProvisionalGovernanceChanged(
       newAddress?: string | null
     ): TypedEventFilter<[string], { newAddress: string }>;
+
+    QuoteWithdrawn(
+      to?: string | null,
+      quantity?: BigNumberish | null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { to: string; quantity: BigNumber }
+    >;
 
     SecondaryFeeAddressUpdated(
       oldAddress?: string | null,
@@ -1179,6 +1205,8 @@ export class LeveragedPoolBalanceDrainMock extends BaseContract {
     poolUpkeep(
       _oldPrice: BigNumberish,
       _newPrice: BigNumberish,
+      _boundedIntervals: boolean,
+      _numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1367,6 +1395,8 @@ export class LeveragedPoolBalanceDrainMock extends BaseContract {
     poolUpkeep(
       _oldPrice: BigNumberish,
       _newPrice: BigNumberish,
+      _boundedIntervals: boolean,
+      _numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

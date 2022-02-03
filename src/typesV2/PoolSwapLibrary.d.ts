@@ -22,6 +22,7 @@ interface PoolSwapLibraryInterface extends ethers.utils.Interface {
   functions: {
     "MAX_DECIMALS()": FunctionFragment;
     "WAD_PRECISION()": FunctionFragment;
+    "addBytes(bytes16,bytes16)": FunctionFragment;
     "appropriateUpdateIntervalId(uint256,uint256,uint256,uint256,uint256)": FunctionFragment;
     "calculatePriceChange(tuple)": FunctionFragment;
     "compareDecimals(bytes16,bytes16)": FunctionFragment;
@@ -42,8 +43,10 @@ interface PoolSwapLibraryInterface extends ethers.utils.Interface {
     "getWithdrawAmountOnBurn(uint256,uint256,uint256,uint256)": FunctionFragment;
     "isBeforeFrontRunningInterval(uint256,uint256,uint256,uint256)": FunctionFragment;
     "mulFraction(uint256,uint256,uint256)": FunctionFragment;
+    "multiplyBytes(bytes16,bytes16)": FunctionFragment;
     "multiplyDecimalByUInt(bytes16,uint256)": FunctionFragment;
     "one()": FunctionFragment;
+    "subtractBytes(bytes16,bytes16)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -53,6 +56,10 @@ interface PoolSwapLibraryInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "WAD_PRECISION",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "addBytes",
+    values: [BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "appropriateUpdateIntervalId",
@@ -164,10 +171,18 @@ interface PoolSwapLibraryInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "multiplyBytes",
+    values: [BytesLike, BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "multiplyDecimalByUInt",
     values: [BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "one", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "subtractBytes",
+    values: [BytesLike, BytesLike]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "MAX_DECIMALS",
@@ -177,6 +192,7 @@ interface PoolSwapLibraryInterface extends ethers.utils.Interface {
     functionFragment: "WAD_PRECISION",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "addBytes", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "appropriateUpdateIntervalId",
     data: BytesLike
@@ -240,10 +256,18 @@ interface PoolSwapLibraryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "multiplyBytes",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "multiplyDecimalByUInt",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "one", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "subtractBytes",
+    data: BytesLike
+  ): Result;
 
   events: {};
 }
@@ -295,6 +319,12 @@ export class PoolSwapLibrary extends BaseContract {
     MAX_DECIMALS(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     WAD_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    addBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     appropriateUpdateIntervalId(
       timestamp: BigNumberish,
@@ -453,6 +483,12 @@ export class PoolSwapLibrary extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    multiplyBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     multiplyDecimalByUInt(
       a: BytesLike,
       b: BigNumberish,
@@ -460,11 +496,23 @@ export class PoolSwapLibrary extends BaseContract {
     ): Promise<[string]>;
 
     one(overrides?: CallOverrides): Promise<[string]>;
+
+    subtractBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
   };
 
   MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
 
   WAD_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+  addBytes(
+    x: BytesLike,
+    y: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   appropriateUpdateIntervalId(
     timestamp: BigNumberish,
@@ -623,6 +671,12 @@ export class PoolSwapLibrary extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  multiplyBytes(
+    x: BytesLike,
+    y: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   multiplyDecimalByUInt(
     a: BytesLike,
     b: BigNumberish,
@@ -631,10 +685,22 @@ export class PoolSwapLibrary extends BaseContract {
 
   one(overrides?: CallOverrides): Promise<string>;
 
+  subtractBytes(
+    x: BytesLike,
+    y: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   callStatic: {
     MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
 
     WAD_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    addBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     appropriateUpdateIntervalId(
       timestamp: BigNumberish,
@@ -793,6 +859,12 @@ export class PoolSwapLibrary extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    multiplyBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     multiplyDecimalByUInt(
       a: BytesLike,
       b: BigNumberish,
@@ -800,6 +872,12 @@ export class PoolSwapLibrary extends BaseContract {
     ): Promise<string>;
 
     one(overrides?: CallOverrides): Promise<string>;
+
+    subtractBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
   };
 
   filters: {};
@@ -808,6 +886,12 @@ export class PoolSwapLibrary extends BaseContract {
     MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
 
     WAD_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    addBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     appropriateUpdateIntervalId(
       timestamp: BigNumberish,
@@ -955,6 +1039,12 @@ export class PoolSwapLibrary extends BaseContract {
       number: BigNumberish,
       numerator: BigNumberish,
       denominator: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    multiplyBytes(
+      x: BytesLike,
+      y: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -965,12 +1055,24 @@ export class PoolSwapLibrary extends BaseContract {
     ): Promise<BigNumber>;
 
     one(overrides?: CallOverrides): Promise<BigNumber>;
+
+    subtractBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     MAX_DECIMALS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     WAD_PRECISION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    addBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     appropriateUpdateIntervalId(
       timestamp: BigNumberish,
@@ -1121,6 +1223,12 @@ export class PoolSwapLibrary extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    multiplyBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     multiplyDecimalByUInt(
       a: BytesLike,
       b: BigNumberish,
@@ -1128,5 +1236,11 @@ export class PoolSwapLibrary extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     one(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    subtractBytes(
+      x: BytesLike,
+      y: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
   };
 }

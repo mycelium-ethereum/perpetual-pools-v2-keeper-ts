@@ -105,13 +105,11 @@ export class ChainlinkOracleWrapper extends BaseContract {
 
     fromWad(wad: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getPrice(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { _price: BigNumber }>;
+    getPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getPriceAndMetadata(
       overrides?: CallOverrides
-    ): Promise<[BigNumber, string] & { _price: BigNumber; _data: string }>;
+    ): Promise<[BigNumber, string]>;
 
     oracle(overrides?: CallOverrides): Promise<[string]>;
 
@@ -126,9 +124,7 @@ export class ChainlinkOracleWrapper extends BaseContract {
 
   getPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getPriceAndMetadata(
-    overrides?: CallOverrides
-  ): Promise<[BigNumber, string] & { _price: BigNumber; _data: string }>;
+  getPriceAndMetadata(overrides?: CallOverrides): Promise<[BigNumber, string]>;
 
   oracle(overrides?: CallOverrides): Promise<string>;
 
@@ -145,7 +141,7 @@ export class ChainlinkOracleWrapper extends BaseContract {
 
     getPriceAndMetadata(
       overrides?: CallOverrides
-    ): Promise<[BigNumber, string] & { _price: BigNumber; _data: string }>;
+    ): Promise<[BigNumber, string]>;
 
     oracle(overrides?: CallOverrides): Promise<string>;
 

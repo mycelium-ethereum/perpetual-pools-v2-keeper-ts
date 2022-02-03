@@ -13,6 +13,32 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
+        name: "factory",
+        type: "address",
+      },
+    ],
+    name: "FactoryChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "price",
+        type: "uint256",
+      },
+    ],
+    name: "GasPriceChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
         name: "_pool",
         type: "address",
       },
@@ -101,6 +127,19 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
+        name: "observer",
+        type: "address",
+      },
+    ],
+    name: "PriceObserverChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
         name: "pool",
         type: "address",
       },
@@ -153,7 +192,7 @@ const _abi = [
         type: "address",
       },
     ],
-    name: "checkUpkeepSinglePool",
+    name: "isUpkeepRequiredSinglePool",
     outputs: [
       {
         internalType: "bool",
@@ -194,8 +233,18 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "pool",
+        name: "_pool",
         type: "address",
+      },
+      {
+        internalType: "bool",
+        name: "boundedIntervals",
+        type: "bool",
+      },
+      {
+        internalType: "uint256",
+        name: "numberOfIntervals",
+        type: "uint256",
       },
     ],
     name: "performUpkeepSinglePool",

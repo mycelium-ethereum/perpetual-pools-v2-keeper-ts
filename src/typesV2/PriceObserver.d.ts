@@ -93,9 +93,11 @@ interface PriceObserverInterface extends ethers.utils.Interface {
 
   events: {
     "OwnershipTransferred(address,address)": EventFragment;
+    "WriterChanged(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WriterChanged"): EventFragment;
 }
 
 export class PriceObserver extends BaseContract {
@@ -364,6 +366,10 @@ export class PriceObserver extends BaseContract {
       [string, string],
       { previousOwner: string; newOwner: string }
     >;
+
+    WriterChanged(
+      writer?: string | null
+    ): TypedEventFilter<[string], { writer: string }>;
   };
 
   estimateGas: {

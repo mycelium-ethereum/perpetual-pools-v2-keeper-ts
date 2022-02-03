@@ -127,7 +127,7 @@ class Keeper {
       // wait until most recently due pool can be upkept according to on-chain time
       attemptPromiseRecursively({
         promise: async () => {
-          const readyForUpkeep = await keeperInstance.checkUpkeepSinglePool(mostRecentlyDuePool.address);
+          const readyForUpkeep = await keeperInstance.isUpkeepRequiredSinglePool(mostRecentlyDuePool.address);
 
           if (!readyForUpkeep) {
             // attemptPromiseRecursively will retry after 1 second
@@ -143,7 +143,7 @@ class Keeper {
           return attemptPromiseRecursively({
             promise: async () => {
               const tx = poolsDueAddresses.length === 1
-                ? await keeperInstance.performUpkeepSinglePool(poolsDueAddresses[0], { gasLimit: this.gasLimit })
+                ? await keeperInstance.performUpkeepSinglePool(poolsDueAddresses[0], false, 0, { gasLimit: this.gasLimit })
                 : await keeperInstance.performUpkeepMultiplePools(poolsDueAddresses, { gasLimit: this.gasLimit });
 
               await this.provider.waitForTransaction(tx.hash);

@@ -28,6 +28,32 @@ const _abi = [
     inputs: [
       {
         indexed: true,
+        internalType: "uint256",
+        name: "_burningFee",
+        type: "uint256",
+      },
+    ],
+    name: "BurningFeeSet",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "_changeInterval",
+        type: "uint256",
+      },
+    ],
+    name: "ChangeIntervalSet",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: "address",
         name: "user",
         type: "address",
@@ -93,6 +119,38 @@ const _abi = [
     type: "event",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "_mintingFee",
+        type: "uint256",
+      },
+    ],
+    name: "MintingFeeSet",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "quote",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "pool",
+        type: "address",
+      },
+    ],
+    name: "QuoteAndPoolChanged",
+    type: "event",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -134,7 +192,18 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "bool",
+        name: "boundedIntervals",
+        type: "bool",
+      },
+      {
+        internalType: "uint256",
+        name: "numberOfIntervals",
+        type: "uint256",
+      },
+    ],
     name: "executeCommitments",
     outputs: [],
     stateMutability: "nonpayable",
@@ -299,6 +368,11 @@ const _abi = [
         type: "address",
       },
       {
+        internalType: "address",
+        name: "_factoryOwner",
+        type: "address",
+      },
+      {
         internalType: "uint256",
         name: "mintingFee",
         type: "uint256",
@@ -308,8 +382,52 @@ const _abi = [
         name: "burningFee",
         type: "uint256",
       },
+      {
+        internalType: "uint256",
+        name: "_changeInterval",
+        type: "uint256",
+      },
     ],
     name: "initialize",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_burningFee",
+        type: "uint256",
+      },
+    ],
+    name: "setBurningFee",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_changeInterval",
+        type: "uint256",
+      },
+    ],
+    name: "setChangeInterval",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_mintingFee",
+        type: "uint256",
+      },
+    ],
+    name: "setMintingFee",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

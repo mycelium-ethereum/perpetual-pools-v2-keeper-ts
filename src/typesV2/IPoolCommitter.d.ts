@@ -24,11 +24,14 @@ interface IPoolCommitterInterface extends ethers.utils.Interface {
   functions: {
     "claim(address)": FunctionFragment;
     "commit(uint8,uint256,bool,bool)": FunctionFragment;
-    "executeCommitments()": FunctionFragment;
+    "executeCommitments(bool,uint256)": FunctionFragment;
     "getAggregateBalance(address)": FunctionFragment;
     "getAppropriateUpdateIntervalId()": FunctionFragment;
     "getPendingCommits()": FunctionFragment;
-    "initialize(address,address,address,uint256,uint256)": FunctionFragment;
+    "initialize(address,address,address,address,uint256,uint256,uint256)": FunctionFragment;
+    "setBurningFee(uint256)": FunctionFragment;
+    "setChangeInterval(uint256)": FunctionFragment;
+    "setMintingFee(uint256)": FunctionFragment;
     "setQuoteAndPool(address,address)": FunctionFragment;
     "updateAggregateBalance(address)": FunctionFragment;
     "updateIntervalId()": FunctionFragment;
@@ -41,7 +44,7 @@ interface IPoolCommitterInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "executeCommitments",
-    values?: undefined
+    values: [boolean, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getAggregateBalance",
@@ -57,7 +60,27 @@ interface IPoolCommitterInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string, BigNumberish, BigNumberish]
+    values: [
+      string,
+      string,
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setBurningFee",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setChangeInterval",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMintingFee",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setQuoteAndPool",
@@ -92,6 +115,18 @@ interface IPoolCommitterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "setBurningFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setChangeInterval",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMintingFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setQuoteAndPool",
     data: BytesLike
   ): Result;
@@ -106,15 +141,23 @@ interface IPoolCommitterInterface extends ethers.utils.Interface {
 
   events: {
     "AggregateBalanceUpdated(address)": EventFragment;
+    "BurningFeeSet(uint256)": EventFragment;
+    "ChangeIntervalSet(uint256)": EventFragment;
     "Claim(address)": EventFragment;
     "CreateCommit(address,uint256,uint8,uint256,bytes16)": EventFragment;
     "ExecutedCommitsForInterval(uint256,bytes16)": EventFragment;
+    "MintingFeeSet(uint256)": EventFragment;
+    "QuoteAndPoolChanged(address,address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AggregateBalanceUpdated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "BurningFeeSet"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ChangeIntervalSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Claim"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CreateCommit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ExecutedCommitsForInterval"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MintingFeeSet"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "QuoteAndPoolChanged"): EventFragment;
 }
 
 export class IPoolCommitter extends BaseContract {
@@ -175,6 +218,8 @@ export class IPoolCommitter extends BaseContract {
     ): Promise<ContractTransaction>;
 
     executeCommitments(
+      boundedIntervals: boolean,
+      numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -246,8 +291,25 @@ export class IPoolCommitter extends BaseContract {
       _factory: string,
       _invariantCheckContract: string,
       _autoClaim: string,
+      _factoryOwner: string,
       mintingFee: BigNumberish,
       burningFee: BigNumberish,
+      _changeInterval: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setBurningFee(
+      _burningFee: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setChangeInterval(
+      _changeInterval: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setMintingFee(
+      _mintingFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -279,6 +341,8 @@ export class IPoolCommitter extends BaseContract {
   ): Promise<ContractTransaction>;
 
   executeCommitments(
+    boundedIntervals: boolean,
+    numberOfIntervals: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -340,8 +404,25 @@ export class IPoolCommitter extends BaseContract {
     _factory: string,
     _invariantCheckContract: string,
     _autoClaim: string,
+    _factoryOwner: string,
     mintingFee: BigNumberish,
     burningFee: BigNumberish,
+    _changeInterval: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setBurningFee(
+    _burningFee: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setChangeInterval(
+    _changeInterval: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setMintingFee(
+    _mintingFee: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -369,7 +450,11 @@ export class IPoolCommitter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    executeCommitments(overrides?: CallOverrides): Promise<void>;
+    executeCommitments(
+      boundedIntervals: boolean,
+      numberOfIntervals: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     getAggregateBalance(
       user: string,
@@ -431,8 +516,25 @@ export class IPoolCommitter extends BaseContract {
       _factory: string,
       _invariantCheckContract: string,
       _autoClaim: string,
+      _factoryOwner: string,
       mintingFee: BigNumberish,
       burningFee: BigNumberish,
+      _changeInterval: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setBurningFee(
+      _burningFee: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setChangeInterval(
+      _changeInterval: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setMintingFee(
+      _mintingFee: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -454,6 +556,14 @@ export class IPoolCommitter extends BaseContract {
     AggregateBalanceUpdated(
       user?: string | null
     ): TypedEventFilter<[string], { user: string }>;
+
+    BurningFeeSet(
+      _burningFee?: BigNumberish | null
+    ): TypedEventFilter<[BigNumber], { _burningFee: BigNumber }>;
+
+    ChangeIntervalSet(
+      _changeInterval?: BigNumberish | null
+    ): TypedEventFilter<[BigNumber], { _changeInterval: BigNumber }>;
 
     Claim(user?: string | null): TypedEventFilter<[string], { user: string }>;
 
@@ -481,6 +591,15 @@ export class IPoolCommitter extends BaseContract {
       [BigNumber, string],
       { updateIntervalId: BigNumber; burningFee: string }
     >;
+
+    MintingFeeSet(
+      _mintingFee?: BigNumberish | null
+    ): TypedEventFilter<[BigNumber], { _mintingFee: BigNumber }>;
+
+    QuoteAndPoolChanged(
+      quote?: string | null,
+      pool?: string | null
+    ): TypedEventFilter<[string, string], { quote: string; pool: string }>;
   };
 
   estimateGas: {
@@ -498,6 +617,8 @@ export class IPoolCommitter extends BaseContract {
     ): Promise<BigNumber>;
 
     executeCommitments(
+      boundedIntervals: boolean,
+      numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -516,8 +637,25 @@ export class IPoolCommitter extends BaseContract {
       _factory: string,
       _invariantCheckContract: string,
       _autoClaim: string,
+      _factoryOwner: string,
       mintingFee: BigNumberish,
       burningFee: BigNumberish,
+      _changeInterval: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setBurningFee(
+      _burningFee: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setChangeInterval(
+      _changeInterval: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setMintingFee(
+      _mintingFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -550,6 +688,8 @@ export class IPoolCommitter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     executeCommitments(
+      boundedIntervals: boolean,
+      numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -568,8 +708,25 @@ export class IPoolCommitter extends BaseContract {
       _factory: string,
       _invariantCheckContract: string,
       _autoClaim: string,
+      _factoryOwner: string,
       mintingFee: BigNumberish,
       burningFee: BigNumberish,
+      _changeInterval: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setBurningFee(
+      _burningFee: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setChangeInterval(
+      _changeInterval: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setMintingFee(
+      _mintingFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -23,24 +23,27 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
   functions: {
     "BASE_TIP()": FunctionFragment;
     "BLOCK_TIME()": FunctionFragment;
-    "MAX_DECIMALS()": FunctionFragment;
+    "FIXED_GAS_OVERHEAD()": FunctionFragment;
+    "FIXED_POINT()": FunctionFragment;
     "MAX_TIP()": FunctionFragment;
     "TIP_DELTA_PER_BLOCK()": FunctionFragment;
     "checkUpkeepMultiplePools(address[])": FunctionFragment;
-    "checkUpkeepSinglePool(address)": FunctionFragment;
     "executionPrice(address)": FunctionFragment;
     "factory()": FunctionFragment;
     "gasPrice()": FunctionFragment;
+    "isUpkeepRequiredSinglePool(address)": FunctionFragment;
     "keeperGas(address,uint256,uint256)": FunctionFragment;
     "keeperReward(address,uint256,uint256,uint256,uint256)": FunctionFragment;
     "keeperTip(uint256,uint256)": FunctionFragment;
     "newPool(address)": FunctionFragment;
+    "observer()": FunctionFragment;
     "owner()": FunctionFragment;
     "performUpkeepMultiplePools(address[])": FunctionFragment;
-    "performUpkeepSinglePool(address)": FunctionFragment;
+    "performUpkeepSinglePool(address,bool,uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "setFactory(address)": FunctionFragment;
     "setGasPrice(uint256)": FunctionFragment;
+    "setPriceObserver(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
 
@@ -50,7 +53,11 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MAX_DECIMALS",
+    functionFragment: "FIXED_GAS_OVERHEAD",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "FIXED_POINT",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "MAX_TIP", values?: undefined): string;
@@ -63,15 +70,15 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
     values: [string[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "checkUpkeepSinglePool",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "executionPrice",
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "factory", values?: undefined): string;
   encodeFunctionData(functionFragment: "gasPrice", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "isUpkeepRequiredSinglePool",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "keeperGas",
     values: [string, BigNumberish, BigNumberish]
@@ -85,6 +92,7 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "newPool", values: [string]): string;
+  encodeFunctionData(functionFragment: "observer", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "performUpkeepMultiplePools",
@@ -92,7 +100,7 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "performUpkeepSinglePool",
-    values: [string]
+    values: [string, boolean, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -104,6 +112,10 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "setPriceObserver",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
@@ -111,7 +123,11 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "BASE_TIP", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "BLOCK_TIME", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "MAX_DECIMALS",
+    functionFragment: "FIXED_GAS_OVERHEAD",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "FIXED_POINT",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "MAX_TIP", data: BytesLike): Result;
@@ -124,15 +140,15 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "checkUpkeepSinglePool",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "executionPrice",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "factory", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "gasPrice", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isUpkeepRequiredSinglePool",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "keeperGas", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "keeperReward",
@@ -140,6 +156,7 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "keeperTip", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "newPool", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "observer", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "performUpkeepMultiplePools",
@@ -159,24 +176,34 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setPriceObserver",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
 
   events: {
+    "FactoryChanged(address)": EventFragment;
+    "GasPriceChanged(uint256)": EventFragment;
     "KeeperPaid(address,address,uint256)": EventFragment;
     "KeeperPaymentError(address,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "PoolAdded(address,int256)": EventFragment;
     "PoolUpkeepError(address,string)": EventFragment;
+    "PriceObserverChanged(address)": EventFragment;
     "UpkeepSuccessful(address,bytes,int256,int256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "FactoryChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "GasPriceChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "KeeperPaid"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "KeeperPaymentError"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolUpkeepError"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PriceObserverChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpkeepSuccessful"): EventFragment;
 }
 
@@ -228,7 +255,9 @@ export class PoolKeeper extends BaseContract {
 
     BLOCK_TIME(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    MAX_DECIMALS(overrides?: CallOverrides): Promise<[BigNumber]>;
+    FIXED_GAS_OVERHEAD(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    FIXED_POINT(overrides?: CallOverrides): Promise<[string]>;
 
     MAX_TIP(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -236,11 +265,6 @@ export class PoolKeeper extends BaseContract {
 
     checkUpkeepMultiplePools(
       _pools: string[],
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    checkUpkeepSinglePool(
-      _pool: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
@@ -252,6 +276,11 @@ export class PoolKeeper extends BaseContract {
     factory(overrides?: CallOverrides): Promise<[string]>;
 
     gasPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    isUpkeepRequiredSinglePool(
+      _pool: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     keeperGas(
       _pool: string,
@@ -280,6 +309,8 @@ export class PoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    observer(overrides?: CallOverrides): Promise<[string]>;
+
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     performUpkeepMultiplePools(
@@ -289,6 +320,8 @@ export class PoolKeeper extends BaseContract {
 
     performUpkeepSinglePool(
       _pool: string,
+      _boundedIntervals: boolean,
+      _numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -306,6 +339,11 @@ export class PoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    setPriceObserver(
+      _observer: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -316,7 +354,9 @@ export class PoolKeeper extends BaseContract {
 
   BLOCK_TIME(overrides?: CallOverrides): Promise<BigNumber>;
 
-  MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
+  FIXED_GAS_OVERHEAD(overrides?: CallOverrides): Promise<BigNumber>;
+
+  FIXED_POINT(overrides?: CallOverrides): Promise<string>;
 
   MAX_TIP(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -327,16 +367,16 @@ export class PoolKeeper extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  checkUpkeepSinglePool(
-    _pool: string,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
   executionPrice(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   factory(overrides?: CallOverrides): Promise<string>;
 
   gasPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+  isUpkeepRequiredSinglePool(
+    _pool: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   keeperGas(
     _pool: string,
@@ -365,6 +405,8 @@ export class PoolKeeper extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  observer(overrides?: CallOverrides): Promise<string>;
+
   owner(overrides?: CallOverrides): Promise<string>;
 
   performUpkeepMultiplePools(
@@ -374,6 +416,8 @@ export class PoolKeeper extends BaseContract {
 
   performUpkeepSinglePool(
     _pool: string,
+    _boundedIntervals: boolean,
+    _numberOfIntervals: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -391,6 +435,11 @@ export class PoolKeeper extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setPriceObserver(
+    _observer: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   transferOwnership(
     newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -401,7 +450,9 @@ export class PoolKeeper extends BaseContract {
 
     BLOCK_TIME(overrides?: CallOverrides): Promise<BigNumber>;
 
-    MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
+    FIXED_GAS_OVERHEAD(overrides?: CallOverrides): Promise<BigNumber>;
+
+    FIXED_POINT(overrides?: CallOverrides): Promise<string>;
 
     MAX_TIP(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -412,16 +463,16 @@ export class PoolKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    checkUpkeepSinglePool(
-      _pool: string,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
     executionPrice(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     factory(overrides?: CallOverrides): Promise<string>;
 
     gasPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    isUpkeepRequiredSinglePool(
+      _pool: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     keeperGas(
       _pool: string,
@@ -447,6 +498,8 @@ export class PoolKeeper extends BaseContract {
 
     newPool(_poolAddress: string, overrides?: CallOverrides): Promise<void>;
 
+    observer(overrides?: CallOverrides): Promise<string>;
+
     owner(overrides?: CallOverrides): Promise<string>;
 
     performUpkeepMultiplePools(
@@ -456,6 +509,8 @@ export class PoolKeeper extends BaseContract {
 
     performUpkeepSinglePool(
       _pool: string,
+      _boundedIntervals: boolean,
+      _numberOfIntervals: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -465,6 +520,11 @@ export class PoolKeeper extends BaseContract {
 
     setGasPrice(_price: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
+    setPriceObserver(
+      _observer: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     transferOwnership(
       newOwner: string,
       overrides?: CallOverrides
@@ -472,6 +532,14 @@ export class PoolKeeper extends BaseContract {
   };
 
   filters: {
+    FactoryChanged(
+      factory?: string | null
+    ): TypedEventFilter<[string], { factory: string }>;
+
+    GasPriceChanged(
+      price?: BigNumberish | null
+    ): TypedEventFilter<[BigNumber], { price: BigNumber }>;
+
     KeeperPaid(
       _pool?: string | null,
       keeper?: string | null,
@@ -511,6 +579,10 @@ export class PoolKeeper extends BaseContract {
       reason?: null
     ): TypedEventFilter<[string, string], { pool: string; reason: string }>;
 
+    PriceObserverChanged(
+      observer?: string | null
+    ): TypedEventFilter<[string], { observer: string }>;
+
     UpkeepSuccessful(
       pool?: string | null,
       data?: null,
@@ -527,7 +599,9 @@ export class PoolKeeper extends BaseContract {
 
     BLOCK_TIME(overrides?: CallOverrides): Promise<BigNumber>;
 
-    MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
+    FIXED_GAS_OVERHEAD(overrides?: CallOverrides): Promise<BigNumber>;
+
+    FIXED_POINT(overrides?: CallOverrides): Promise<BigNumber>;
 
     MAX_TIP(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -538,16 +612,16 @@ export class PoolKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    checkUpkeepSinglePool(
-      _pool: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     executionPrice(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     factory(overrides?: CallOverrides): Promise<BigNumber>;
 
     gasPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    isUpkeepRequiredSinglePool(
+      _pool: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     keeperGas(
       _pool: string,
@@ -576,6 +650,8 @@ export class PoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    observer(overrides?: CallOverrides): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     performUpkeepMultiplePools(
@@ -585,6 +661,8 @@ export class PoolKeeper extends BaseContract {
 
     performUpkeepSinglePool(
       _pool: string,
+      _boundedIntervals: boolean,
+      _numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -599,6 +677,11 @@ export class PoolKeeper extends BaseContract {
 
     setGasPrice(
       _price: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setPriceObserver(
+      _observer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -613,7 +696,11 @@ export class PoolKeeper extends BaseContract {
 
     BLOCK_TIME(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    MAX_DECIMALS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    FIXED_GAS_OVERHEAD(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    FIXED_POINT(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     MAX_TIP(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -626,11 +713,6 @@ export class PoolKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    checkUpkeepSinglePool(
-      _pool: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     executionPrice(
       arg0: string,
       overrides?: CallOverrides
@@ -639,6 +721,11 @@ export class PoolKeeper extends BaseContract {
     factory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     gasPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    isUpkeepRequiredSinglePool(
+      _pool: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     keeperGas(
       _pool: string,
@@ -667,6 +754,8 @@ export class PoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    observer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     performUpkeepMultiplePools(
@@ -676,6 +765,8 @@ export class PoolKeeper extends BaseContract {
 
     performUpkeepSinglePool(
       _pool: string,
+      _boundedIntervals: boolean,
+      _numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -690,6 +781,11 @@ export class PoolKeeper extends BaseContract {
 
     setGasPrice(
       _price: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setPriceObserver(
+      _observer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

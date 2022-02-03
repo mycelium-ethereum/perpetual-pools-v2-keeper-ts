@@ -21,6 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SMAOracleInterface extends ethers.utils.Interface {
   functions: {
+    "INITIAL_NUM_PERIODS()": FunctionFragment;
     "MAX_DECIMALS()": FunctionFragment;
     "SMA(int256[24],uint256)": FunctionFragment;
     "deployer()": FunctionFragment;
@@ -33,8 +34,13 @@ interface SMAOracleInterface extends ethers.utils.Interface {
     "poll()": FunctionFragment;
     "price()": FunctionFragment;
     "scaler()": FunctionFragment;
+    "setInitialObservation()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "INITIAL_NUM_PERIODS",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "MAX_DECIMALS",
     values?: undefined
@@ -87,7 +93,15 @@ interface SMAOracleInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "poll", values?: undefined): string;
   encodeFunctionData(functionFragment: "price", values?: undefined): string;
   encodeFunctionData(functionFragment: "scaler", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "setInitialObservation",
+    values?: undefined
+  ): string;
 
+  decodeFunctionResult(
+    functionFragment: "INITIAL_NUM_PERIODS",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "MAX_DECIMALS",
     data: BytesLike
@@ -106,6 +120,10 @@ interface SMAOracleInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "poll", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "price", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "scaler", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setInitialObservation",
+    data: BytesLike
+  ): Result;
 
   events: {};
 }
@@ -154,6 +172,8 @@ export class SMAOracle extends BaseContract {
   interface: SMAOracleInterface;
 
   functions: {
+    INITIAL_NUM_PERIODS(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     MAX_DECIMALS(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     SMA(
@@ -210,7 +230,13 @@ export class SMAOracle extends BaseContract {
     price(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     scaler(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    setInitialObservation(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
+
+  INITIAL_NUM_PERIODS(overrides?: CallOverrides): Promise<BigNumber>;
 
   MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -269,7 +295,13 @@ export class SMAOracle extends BaseContract {
 
   scaler(overrides?: CallOverrides): Promise<BigNumber>;
 
+  setInitialObservation(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
+    INITIAL_NUM_PERIODS(overrides?: CallOverrides): Promise<BigNumber>;
+
     MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
 
     SMA(
@@ -324,11 +356,15 @@ export class SMAOracle extends BaseContract {
     price(overrides?: CallOverrides): Promise<BigNumber>;
 
     scaler(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setInitialObservation(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {};
 
   estimateGas: {
+    INITIAL_NUM_PERIODS(overrides?: CallOverrides): Promise<BigNumber>;
+
     MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
 
     SMA(
@@ -383,9 +419,17 @@ export class SMAOracle extends BaseContract {
     price(overrides?: CallOverrides): Promise<BigNumber>;
 
     scaler(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setInitialObservation(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    INITIAL_NUM_PERIODS(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     MAX_DECIMALS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     SMA(
@@ -445,5 +489,9 @@ export class SMAOracle extends BaseContract {
     price(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     scaler(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    setInitialObservation(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
   };
 }

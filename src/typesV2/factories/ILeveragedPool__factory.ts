@@ -72,6 +72,25 @@ const _abi = [
     inputs: [
       {
         indexed: true,
+        internalType: "uint256",
+        name: "long",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "short",
+        type: "uint256",
+      },
+    ],
+    name: "PoolBalancesChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: "address",
         name: "longToken",
         type: "address",
@@ -159,6 +178,25 @@ const _abi = [
       },
     ],
     name: "ProvisionalGovernanceChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "quantity",
+        type: "uint256",
+      },
+    ],
+    name: "QuoteWithdrawn",
     type: "event",
   },
   {
@@ -567,6 +605,16 @@ const _abi = [
         internalType: "int256",
         name: "_newPrice",
         type: "int256",
+      },
+      {
+        internalType: "bool",
+        name: "_boundedIntervals",
+        type: "bool",
+      },
+      {
+        internalType: "uint256",
+        name: "_numberOfIntervals",
+        type: "uint256",
       },
     ],
     name: "poolUpkeep",
