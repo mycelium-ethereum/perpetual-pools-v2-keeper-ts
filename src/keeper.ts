@@ -1,10 +1,16 @@
 import { ethers } from 'ethers';
-import { makeGraphRequest } from './thegraph';
-import { LeveragedPool, LeveragedPool__factory, PoolKeeper, PoolKeeper__factory } from './typesV2';
+import {
+  LeveragedPool,
+  LeveragedPool__factory,
+  PoolKeeper,
+  PoolKeeper__factory,
+  PoolFactory__factory,
+  PoolFactory
+} from './typesV2';
 import { attemptPromiseRecursively } from './utils';
 
 type KeeperConstructorArgs = {
-  graphUrl: string,
+  poolFactoryAddress: string,
   nodeUrl: string,
   privateKey: string,
   skipPools: { [poolAddress: string]: boolean },
@@ -21,16 +27,10 @@ type WatchedPool = {
   isBusy: boolean
 }
 
-type GraphLeveragedPool = {
-  keeper: string,
-  id: string,
-  updateInterval: string
-}
-
 class Keeper {
   provider: ethers.providers.BaseProvider
   wallet: ethers.Wallet
-  graphUrl: string
+  poolFactoryInstance: PoolFactory
   watchedPools: Record<string, WatchedPool>
   keeperInstances: Record<string, PoolKeeper>
   scheduledUpkeeps: Record<string, Record<string, { pools: string[], upkeepPromise: Promise<void> }>>
@@ -38,10 +38,10 @@ class Keeper {
   onChainTimestamp: number
   gasLimit: number
 
-  constructor ({ graphUrl, nodeUrl, privateKey, skipPools, gasLimit }: KeeperConstructorArgs) {
+  constructor ({ nodeUrl, privateKey, skipPools, gasLimit, poolFactoryAddress }: KeeperConstructorArgs) {
     this.provider = ethers.getDefaultProvider(nodeUrl);
+    this.poolFactoryInstance = PoolFactory__factory.connect(poolFactoryAddress, this.provider);
     this.wallet = new ethers.Wallet(privateKey, this.provider);
-    this.graphUrl = graphUrl;
     this.onChainTimestamp = 0;
     this.watchedPools = {};
     this.keeperInstances = {};
@@ -50,53 +50,55 @@ class Keeper {
     this.gasLimit = gasLimit;
   }
 
-  // fetch known pools from the graph and add any new ones as a watched pool
-  async syncWatchedPools () {
-    const graphResponse = await makeGraphRequest<{ data: { leveragedPools: GraphLeveragedPool[] } }>({
-      url: this.graphUrl,
-      query: `
-        {
-          leveragedPools {
-            id
-            keeper
-            updateInterval
-          }
+  // fetch known pools from the factory and add them as watched pools
+  async syncKnownPools () {
+    // create instance of pool factory
+    // search logs for all DeployPool events
+    // for each event, initialize the watched pool
+
+    const deployPoolEventsFilter = this.poolFactoryInstance.filters.DeployPool();
+
+    const deployPoolEvents = await this.poolFactoryInstance.queryFilter(deployPoolEventsFilter);
+
+    for (const event of deployPoolEvents) {
+      await this.initializeWatchedPool(event.args.pool);
+    }
+  }
+
+  initializeWatchedPool (poolAddress: string) {
+    console.log(`initializing ${poolAddress} as a watched pool`);
+    return attemptPromiseRecursively({
+      promise: async () => {
+        const poolInstance = LeveragedPool__factory.connect(poolAddress, this.provider);
+
+        const [
+          lastPriceTimestamp,
+          updateInterval,
+          keeper
+        ] = await Promise.all([
+          poolInstance.lastPriceTimestamp(),
+          poolInstance.updateInterval(),
+          poolInstance.keeper()
+        ]);
+        const lastPriceTimestampNumber = lastPriceTimestamp.toNumber();
+
+        const updateIntervalNumber = Number(updateInterval);
+
+        this.watchedPools[poolAddress] = {
+          address: poolAddress,
+          keeperAddress: keeper,
+          updateInterval: updateIntervalNumber,
+          lastPriceTimestamp: lastPriceTimestampNumber,
+          contractInstance: poolInstance,
+          nextUpkeepDue: lastPriceTimestampNumber + updateIntervalNumber,
+          isBusy: false
+        };
+
+        if (!this.keeperInstances[keeper]) {
+          this.keeperInstances[keeper] = PoolKeeper__factory.connect(keeper, this.wallet);
         }
-      `
-    });
-
-    const promises = graphResponse.data.leveragedPools.map(({ id, keeper, updateInterval }) => {
-      if (!this.watchedPools[id] && !this.skipPools[id]) {
-        console.log(`Adding ${id} as a watched pool`);
-        return attemptPromiseRecursively({
-          promise: async () => {
-            const poolInstance = LeveragedPool__factory.connect(id, this.provider);
-
-            const lastPriceTimestamp = await poolInstance.lastPriceTimestamp();
-            const lastPriceTimestampNumber = lastPriceTimestamp.toNumber();
-
-            const updateIntervalNumber = Number(updateInterval);
-
-            this.watchedPools[id] = {
-              address: id,
-              keeperAddress: keeper,
-              updateInterval: updateIntervalNumber,
-              lastPriceTimestamp: lastPriceTimestampNumber,
-              contractInstance: poolInstance,
-              nextUpkeepDue: lastPriceTimestampNumber + updateIntervalNumber,
-              isBusy: false
-            };
-
-            if (!this.keeperInstances[keeper]) {
-              this.keeperInstances[keeper] = PoolKeeper__factory.connect(keeper, this.wallet);
-            }
-          }
-        });
       }
-      return Promise.resolve();
     });
-
-    await Promise.all(promises);
   }
 
   processDueUpkeeps () {
@@ -143,7 +145,7 @@ class Keeper {
           return attemptPromiseRecursively({
             promise: async () => {
               const tx = poolsDueAddresses.length === 1
-                ? await keeperInstance.performUpkeepSinglePool(poolsDueAddresses[0], false, 0, { gasLimit: this.gasLimit })
+                ? await keeperInstance.performUpkeepSinglePool(poolsDueAddresses[0], { gasLimit: this.gasLimit })
                 : await keeperInstance.performUpkeepMultiplePools(poolsDueAddresses, { gasLimit: this.gasLimit });
 
               await this.provider.waitForTransaction(tx.hash);
@@ -181,8 +183,12 @@ class Keeper {
     setInterval(this.processDueUpkeeps.bind(this), interval);
   }
 
-  startSyncingNewPools ({ interval }: { interval: number }) {
-    setInterval(this.syncWatchedPools.bind(this), interval);
+  startWatchingForNewPools () {
+    const deployPoolEventsFilter = this.poolFactoryInstance.filters.DeployPool();
+
+    this.poolFactoryInstance.on(deployPoolEventsFilter, async (poolAddress) => {
+      await this.initializeWatchedPool(poolAddress);
+    });
   }
 }
 
