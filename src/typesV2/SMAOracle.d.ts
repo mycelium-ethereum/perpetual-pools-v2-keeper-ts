@@ -21,62 +21,27 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SMAOracleInterface extends ethers.utils.Interface {
   functions: {
-    "INITIAL_NUM_PERIODS()": FunctionFragment;
-    "MAX_DECIMALS()": FunctionFragment;
-    "SMA(int256[24],uint256)": FunctionFragment;
+    "MAX_PERIODS()": FunctionFragment;
+    "decimals()": FunctionFragment;
     "deployer()": FunctionFragment;
     "fromWad(int256)": FunctionFragment;
     "getPrice()": FunctionFragment;
     "getPriceAndMetadata()": FunctionFragment;
-    "observer()": FunctionFragment;
+    "lastUpdate()": FunctionFragment;
+    "numPeriods()": FunctionFragment;
     "oracle()": FunctionFragment;
-    "periods()": FunctionFragment;
+    "periodCount()": FunctionFragment;
     "poll()": FunctionFragment;
-    "price()": FunctionFragment;
+    "prices(uint256)": FunctionFragment;
     "scaler()": FunctionFragment;
-    "setInitialObservation()": FunctionFragment;
+    "updateInterval()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "INITIAL_NUM_PERIODS",
+    functionFragment: "MAX_PERIODS",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "MAX_DECIMALS",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "SMA",
-    values: [
-      [
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish
-      ],
-      BigNumberish
-    ]
-  ): string;
+  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(functionFragment: "deployer", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "fromWad",
@@ -87,26 +52,35 @@ interface SMAOracleInterface extends ethers.utils.Interface {
     functionFragment: "getPriceAndMetadata",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "observer", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "lastUpdate",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "numPeriods",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "oracle", values?: undefined): string;
-  encodeFunctionData(functionFragment: "periods", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "periodCount",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "poll", values?: undefined): string;
-  encodeFunctionData(functionFragment: "price", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "prices",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "scaler", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "setInitialObservation",
+    functionFragment: "updateInterval",
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "INITIAL_NUM_PERIODS",
+    functionFragment: "MAX_PERIODS",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "MAX_DECIMALS",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "SMA", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deployer", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "fromWad", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
@@ -114,14 +88,18 @@ interface SMAOracleInterface extends ethers.utils.Interface {
     functionFragment: "getPriceAndMetadata",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "observer", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "lastUpdate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "numPeriods", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "oracle", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "periods", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "periodCount",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "poll", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "price", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "prices", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "scaler", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "setInitialObservation",
+    functionFragment: "updateInterval",
     data: BytesLike
   ): Result;
 
@@ -172,40 +150,9 @@ export class SMAOracle extends BaseContract {
   interface: SMAOracleInterface;
 
   functions: {
-    INITIAL_NUM_PERIODS(overrides?: CallOverrides): Promise<[BigNumber]>;
+    MAX_PERIODS(overrides?: CallOverrides): Promise<[number]>;
 
-    MAX_DECIMALS(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    SMA(
-      xs: [
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish
-      ],
-      k: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    decimals(overrides?: CallOverrides): Promise<[number]>;
 
     deployer(overrides?: CallOverrides): Promise<[string]>;
 
@@ -217,59 +164,28 @@ export class SMAOracle extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber, string] & { _price: BigNumber; _data: string }>;
 
-    observer(overrides?: CallOverrides): Promise<[string]>;
+    lastUpdate(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    numPeriods(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     oracle(overrides?: CallOverrides): Promise<[string]>;
 
-    periods(overrides?: CallOverrides): Promise<[BigNumber]>;
+    periodCount(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     poll(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    price(overrides?: CallOverrides): Promise<[BigNumber]>;
+    prices(arg0: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     scaler(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    setInitialObservation(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    updateInterval(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
-  INITIAL_NUM_PERIODS(overrides?: CallOverrides): Promise<BigNumber>;
+  MAX_PERIODS(overrides?: CallOverrides): Promise<number>;
 
-  MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
-
-  SMA(
-    xs: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish
-    ],
-    k: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  decimals(overrides?: CallOverrides): Promise<number>;
 
   deployer(overrides?: CallOverrides): Promise<string>;
 
@@ -281,59 +197,28 @@ export class SMAOracle extends BaseContract {
     overrides?: CallOverrides
   ): Promise<[BigNumber, string] & { _price: BigNumber; _data: string }>;
 
-  observer(overrides?: CallOverrides): Promise<string>;
+  lastUpdate(overrides?: CallOverrides): Promise<BigNumber>;
+
+  numPeriods(overrides?: CallOverrides): Promise<BigNumber>;
 
   oracle(overrides?: CallOverrides): Promise<string>;
 
-  periods(overrides?: CallOverrides): Promise<BigNumber>;
+  periodCount(overrides?: CallOverrides): Promise<BigNumber>;
 
   poll(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  price(overrides?: CallOverrides): Promise<BigNumber>;
+  prices(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
   scaler(overrides?: CallOverrides): Promise<BigNumber>;
 
-  setInitialObservation(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  updateInterval(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    INITIAL_NUM_PERIODS(overrides?: CallOverrides): Promise<BigNumber>;
+    MAX_PERIODS(overrides?: CallOverrides): Promise<number>;
 
-    MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
-
-    SMA(
-      xs: [
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish
-      ],
-      k: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    decimals(overrides?: CallOverrides): Promise<number>;
 
     deployer(overrides?: CallOverrides): Promise<string>;
 
@@ -345,58 +230,29 @@ export class SMAOracle extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber, string] & { _price: BigNumber; _data: string }>;
 
-    observer(overrides?: CallOverrides): Promise<string>;
+    lastUpdate(overrides?: CallOverrides): Promise<BigNumber>;
+
+    numPeriods(overrides?: CallOverrides): Promise<BigNumber>;
 
     oracle(overrides?: CallOverrides): Promise<string>;
 
-    periods(overrides?: CallOverrides): Promise<BigNumber>;
+    periodCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     poll(overrides?: CallOverrides): Promise<BigNumber>;
 
-    price(overrides?: CallOverrides): Promise<BigNumber>;
+    prices(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     scaler(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setInitialObservation(overrides?: CallOverrides): Promise<void>;
+    updateInterval(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {};
 
   estimateGas: {
-    INITIAL_NUM_PERIODS(overrides?: CallOverrides): Promise<BigNumber>;
+    MAX_PERIODS(overrides?: CallOverrides): Promise<BigNumber>;
 
-    MAX_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
-
-    SMA(
-      xs: [
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish
-      ],
-      k: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     deployer(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -406,62 +262,29 @@ export class SMAOracle extends BaseContract {
 
     getPriceAndMetadata(overrides?: CallOverrides): Promise<BigNumber>;
 
-    observer(overrides?: CallOverrides): Promise<BigNumber>;
+    lastUpdate(overrides?: CallOverrides): Promise<BigNumber>;
+
+    numPeriods(overrides?: CallOverrides): Promise<BigNumber>;
 
     oracle(overrides?: CallOverrides): Promise<BigNumber>;
 
-    periods(overrides?: CallOverrides): Promise<BigNumber>;
+    periodCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     poll(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    price(overrides?: CallOverrides): Promise<BigNumber>;
+    prices(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     scaler(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setInitialObservation(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    updateInterval(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    INITIAL_NUM_PERIODS(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    MAX_PERIODS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    MAX_DECIMALS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    SMA(
-      xs: [
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish
-      ],
-      k: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     deployer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -476,22 +299,25 @@ export class SMAOracle extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    observer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    lastUpdate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    numPeriods(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     oracle(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    periods(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    periodCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     poll(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    price(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    prices(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     scaler(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    setInitialObservation(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    updateInterval(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

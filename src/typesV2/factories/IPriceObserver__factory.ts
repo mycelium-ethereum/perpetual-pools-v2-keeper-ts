@@ -11,19 +11,6 @@ import type {
 
 const _abi = [
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "writer",
-        type: "address",
-      },
-    ],
-    name: "WriterChanged",
-    type: "event",
-  },
-  {
     inputs: [
       {
         internalType: "int256",
