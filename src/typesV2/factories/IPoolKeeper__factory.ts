@@ -89,6 +89,25 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
+        name: "oldKeeperRewards",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newKeeperRewards",
+        type: "address",
+      },
+    ],
+    name: "KeeperRewardsSet",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
         name: "poolAddress",
         type: "address",
       },
@@ -191,6 +210,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "keeperRewards",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -219,12 +251,51 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "bytes",
+        name: "pools",
+        type: "bytes",
+      },
+    ],
+    name: "performUpkeepMultiplePoolsPacked",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "pool",
         type: "address",
       },
     ],
     name: "performUpkeepSinglePool",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_price",
+        type: "uint256",
+      },
+    ],
+    name: "setGasPrice",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_keeperRewards",
+        type: "address",
+      },
+    ],
+    name: "setKeeperRewards",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

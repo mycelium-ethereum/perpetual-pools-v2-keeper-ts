@@ -23,9 +23,13 @@ interface IPoolKeeperInterface extends ethers.utils.Interface {
   functions: {
     "checkUpkeepMultiplePools(address[])": FunctionFragment;
     "isUpkeepRequiredSinglePool(address)": FunctionFragment;
+    "keeperRewards()": FunctionFragment;
     "newPool(address)": FunctionFragment;
     "performUpkeepMultiplePools(address[])": FunctionFragment;
+    "performUpkeepMultiplePoolsPacked(bytes)": FunctionFragment;
     "performUpkeepSinglePool(address)": FunctionFragment;
+    "setGasPrice(uint256)": FunctionFragment;
+    "setKeeperRewards(address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -36,13 +40,29 @@ interface IPoolKeeperInterface extends ethers.utils.Interface {
     functionFragment: "isUpkeepRequiredSinglePool",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "keeperRewards",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "newPool", values: [string]): string;
   encodeFunctionData(
     functionFragment: "performUpkeepMultiplePools",
     values: [string[]]
   ): string;
   encodeFunctionData(
+    functionFragment: "performUpkeepMultiplePoolsPacked",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "performUpkeepSinglePool",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setGasPrice",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setKeeperRewards",
     values: [string]
   ): string;
 
@@ -54,13 +74,29 @@ interface IPoolKeeperInterface extends ethers.utils.Interface {
     functionFragment: "isUpkeepRequiredSinglePool",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "keeperRewards",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "newPool", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "performUpkeepMultiplePools",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "performUpkeepMultiplePoolsPacked",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "performUpkeepSinglePool",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setGasPrice",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setKeeperRewards",
     data: BytesLike
   ): Result;
 
@@ -69,6 +105,7 @@ interface IPoolKeeperInterface extends ethers.utils.Interface {
     "GasPriceChanged(uint256)": EventFragment;
     "KeeperPaid(address,address,uint256)": EventFragment;
     "KeeperPaymentError(address,address,uint256)": EventFragment;
+    "KeeperRewardsSet(address,address)": EventFragment;
     "PoolAdded(address,int256)": EventFragment;
     "PoolUpkeepError(address,string)": EventFragment;
     "UpkeepSuccessful(address,bytes,int256,int256)": EventFragment;
@@ -78,6 +115,7 @@ interface IPoolKeeperInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "GasPriceChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "KeeperPaid"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "KeeperPaymentError"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "KeeperRewardsSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolUpkeepError"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpkeepSuccessful"): EventFragment;
@@ -137,6 +175,10 @@ export class IPoolKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    keeperRewards(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     newPool(
       _poolAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -147,8 +189,23 @@ export class IPoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    performUpkeepMultiplePoolsPacked(
+      pools: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     performUpkeepSinglePool(
       pool: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setGasPrice(
+      _price: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setKeeperRewards(
+      _keeperRewards: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -163,6 +220,10 @@ export class IPoolKeeper extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  keeperRewards(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   newPool(
     _poolAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -173,8 +234,23 @@ export class IPoolKeeper extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  performUpkeepMultiplePoolsPacked(
+    pools: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   performUpkeepSinglePool(
     pool: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setGasPrice(
+    _price: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setKeeperRewards(
+    _keeperRewards: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -189,6 +265,8 @@ export class IPoolKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    keeperRewards(overrides?: CallOverrides): Promise<string>;
+
     newPool(_poolAddress: string, overrides?: CallOverrides): Promise<void>;
 
     performUpkeepMultiplePools(
@@ -196,8 +274,20 @@ export class IPoolKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    performUpkeepMultiplePoolsPacked(
+      pools: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     performUpkeepSinglePool(
       pool: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setGasPrice(_price: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    setKeeperRewards(
+      _keeperRewards: string,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -227,6 +317,14 @@ export class IPoolKeeper extends BaseContract {
     ): TypedEventFilter<
       [string, string, BigNumber],
       { _pool: string; keeper: string; expectedReward: BigNumber }
+    >;
+
+    KeeperRewardsSet(
+      oldKeeperRewards?: string | null,
+      newKeeperRewards?: string | null
+    ): TypedEventFilter<
+      [string, string],
+      { oldKeeperRewards: string; newKeeperRewards: string }
     >;
 
     PoolAdded(
@@ -264,6 +362,10 @@ export class IPoolKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    keeperRewards(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     newPool(
       _poolAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -274,8 +376,23 @@ export class IPoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    performUpkeepMultiplePoolsPacked(
+      pools: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     performUpkeepSinglePool(
       pool: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setGasPrice(
+      _price: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setKeeperRewards(
+      _keeperRewards: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -291,6 +408,10 @@ export class IPoolKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    keeperRewards(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     newPool(
       _poolAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -301,8 +422,23 @@ export class IPoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    performUpkeepMultiplePoolsPacked(
+      pools: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     performUpkeepSinglePool(
       pool: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setGasPrice(
+      _price: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setKeeperRewards(
+      _keeperRewards: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

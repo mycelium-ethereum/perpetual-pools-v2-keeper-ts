@@ -172,24 +172,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "enum IPoolCommitter.CommitType",
-        name: "commitType",
-        type: "uint8",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "fromAggregateBalance",
-        type: "bool",
-      },
-      {
-        internalType: "bool",
-        name: "payForClaim",
-        type: "bool",
+        internalType: "bytes32",
+        name: "args",
+        type: "bytes32",
       },
     ],
     name: "commit",

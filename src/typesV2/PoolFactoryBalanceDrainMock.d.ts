@@ -575,7 +575,7 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
 
     DeployCommitter(
       poolCommitterAddress?: null,
-      quoteToken?: null,
+      settlementToken?: null,
       pool?: null,
       changeInterval?: null,
       feeController?: null
@@ -583,7 +583,7 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       [string, string, string, BigNumber, string],
       {
         poolCommitterAddress: string;
-        quoteToken: string;
+        settlementToken: string;
         pool: string;
         changeInterval: BigNumber;
         feeController: string;

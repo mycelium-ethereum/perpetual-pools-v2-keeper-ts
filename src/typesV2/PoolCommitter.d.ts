@@ -30,7 +30,7 @@ interface PoolCommitterInterface extends ethers.utils.Interface {
     "burningFee()": FunctionFragment;
     "changeInterval()": FunctionFragment;
     "claim(address)": FunctionFragment;
-    "commit(uint8,uint256,bool,bool)": FunctionFragment;
+    "commit(bytes32)": FunctionFragment;
     "executeCommitments(uint256,uint256,uint256,uint256)": FunctionFragment;
     "factory()": FunctionFragment;
     "feeController()": FunctionFragment;
@@ -91,10 +91,7 @@ interface PoolCommitterInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "claim", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "commit",
-    values: [BigNumberish, BigNumberish, boolean, boolean]
-  ): string;
+  encodeFunctionData(functionFragment: "commit", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "executeCommitments",
     values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
@@ -433,10 +430,7 @@ export class PoolCommitter extends BaseContract {
     ): Promise<ContractTransaction>;
 
     commit(
-      commitType: BigNumberish,
-      amount: BigNumberish,
-      fromAggregateBalance: boolean,
-      payForClaim: boolean,
+      args: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -651,10 +645,7 @@ export class PoolCommitter extends BaseContract {
   ): Promise<ContractTransaction>;
 
   commit(
-    commitType: BigNumberish,
-    amount: BigNumberish,
-    fromAggregateBalance: boolean,
-    payForClaim: boolean,
+    args: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -859,13 +850,7 @@ export class PoolCommitter extends BaseContract {
 
     claim(user: string, overrides?: CallOverrides): Promise<void>;
 
-    commit(
-      commitType: BigNumberish,
-      amount: BigNumberish,
-      fromAggregateBalance: boolean,
-      payForClaim: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    commit(args: BytesLike, overrides?: CallOverrides): Promise<void>;
 
     executeCommitments(
       lastPriceTimestamp: BigNumberish,
@@ -1125,10 +1110,7 @@ export class PoolCommitter extends BaseContract {
     ): Promise<BigNumber>;
 
     commit(
-      commitType: BigNumberish,
-      amount: BigNumberish,
-      fromAggregateBalance: boolean,
-      payForClaim: boolean,
+      args: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1284,10 +1266,7 @@ export class PoolCommitter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     commit(
-      commitType: BigNumberish,
-      amount: BigNumberish,
-      fromAggregateBalance: boolean,
-      payForClaim: boolean,
+      args: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

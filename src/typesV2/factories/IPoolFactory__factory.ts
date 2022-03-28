@@ -32,7 +32,7 @@ const _abi = [
       {
         indexed: false,
         internalType: "address",
-        name: "quoteToken",
+        name: "settlementToken",
         type: "address",
       },
       {

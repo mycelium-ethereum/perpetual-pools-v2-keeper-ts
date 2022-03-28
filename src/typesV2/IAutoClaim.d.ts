@@ -25,8 +25,8 @@ interface IAutoClaimInterface extends ethers.utils.Interface {
     "checkClaim(tuple,uint256)": FunctionFragment;
     "checkUserClaim(address,address)": FunctionFragment;
     "makePaidClaimRequest(address)": FunctionFragment;
-    "multiPaidClaimMultiplePoolCommitters(address[],address[])": FunctionFragment;
-    "multiPaidClaimSinglePoolCommitter(address[],address)": FunctionFragment;
+    "multiPaidClaimMultiplePoolCommitters(bytes,bytes)": FunctionFragment;
+    "multiPaidClaimSinglePoolCommitter(bytes,address)": FunctionFragment;
     "paidClaim(address,address)": FunctionFragment;
     "withdrawClaimRequest(address)": FunctionFragment;
     "withdrawUserClaimRequest(address)": FunctionFragment;
@@ -49,11 +49,11 @@ interface IAutoClaimInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "multiPaidClaimMultiplePoolCommitters",
-    values: [string[], string[]]
+    values: [BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "multiPaidClaimSinglePoolCommitter",
-    values: [string[], string]
+    values: [BytesLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "paidClaim",
@@ -170,13 +170,13 @@ export class IAutoClaim extends BaseContract {
     ): Promise<ContractTransaction>;
 
     multiPaidClaimMultiplePoolCommitters(
-      users: string[],
-      poolCommitterAddresses: string[],
+      args1: BytesLike,
+      args2: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     multiPaidClaimSinglePoolCommitter(
-      users: string[],
+      args: BytesLike,
       poolCommitterAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -216,13 +216,13 @@ export class IAutoClaim extends BaseContract {
   ): Promise<ContractTransaction>;
 
   multiPaidClaimMultiplePoolCommitters(
-    users: string[],
-    poolCommitterAddresses: string[],
+    args1: BytesLike,
+    args2: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   multiPaidClaimSinglePoolCommitter(
-    users: string[],
+    args: BytesLike,
     poolCommitterAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -262,13 +262,13 @@ export class IAutoClaim extends BaseContract {
     ): Promise<void>;
 
     multiPaidClaimMultiplePoolCommitters(
-      users: string[],
-      poolCommitterAddresses: string[],
+      args1: BytesLike,
+      args2: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
     multiPaidClaimSinglePoolCommitter(
-      users: string[],
+      args: BytesLike,
       poolCommitterAddress: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -352,13 +352,13 @@ export class IAutoClaim extends BaseContract {
     ): Promise<BigNumber>;
 
     multiPaidClaimMultiplePoolCommitters(
-      users: string[],
-      poolCommitterAddresses: string[],
+      args1: BytesLike,
+      args2: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     multiPaidClaimSinglePoolCommitter(
-      users: string[],
+      args: BytesLike,
       poolCommitterAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -399,13 +399,13 @@ export class IAutoClaim extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     multiPaidClaimMultiplePoolCommitters(
-      users: string[],
-      poolCommitterAddresses: string[],
+      args1: BytesLike,
+      args2: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     multiPaidClaimSinglePoolCommitter(
-      users: string[],
+      args: BytesLike,
       poolCommitterAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

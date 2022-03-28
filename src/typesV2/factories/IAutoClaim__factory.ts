@@ -183,14 +183,14 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address[]",
-        name: "users",
-        type: "address[]",
+        internalType: "bytes",
+        name: "args1",
+        type: "bytes",
       },
       {
-        internalType: "address[]",
-        name: "poolCommitterAddresses",
-        type: "address[]",
+        internalType: "bytes",
+        name: "args2",
+        type: "bytes",
       },
     ],
     name: "multiPaidClaimMultiplePoolCommitters",
@@ -201,9 +201,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address[]",
-        name: "users",
-        type: "address[]",
+        internalType: "bytes",
+        name: "args",
+        type: "bytes",
       },
       {
         internalType: "address",
