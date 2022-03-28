@@ -20,6 +20,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface ChainlinkOracleWrapperInterface extends ethers.utils.Interface {
   functions: {
+    "decimals()": FunctionFragment;
     "deployer()": FunctionFragment;
     "fromWad(int256)": FunctionFragment;
     "getPrice()": FunctionFragment;
@@ -29,6 +30,7 @@ interface ChainlinkOracleWrapperInterface extends ethers.utils.Interface {
     "scaler()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(functionFragment: "deployer", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "fromWad",
@@ -43,6 +45,7 @@ interface ChainlinkOracleWrapperInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "poll", values?: undefined): string;
   encodeFunctionData(functionFragment: "scaler", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deployer", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "fromWad", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
@@ -101,6 +104,8 @@ export class ChainlinkOracleWrapper extends BaseContract {
   interface: ChainlinkOracleWrapperInterface;
 
   functions: {
+    decimals(overrides?: CallOverrides): Promise<[number]>;
+
     deployer(overrides?: CallOverrides): Promise<[string]>;
 
     fromWad(wad: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -118,6 +123,8 @@ export class ChainlinkOracleWrapper extends BaseContract {
     scaler(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
+  decimals(overrides?: CallOverrides): Promise<number>;
+
   deployer(overrides?: CallOverrides): Promise<string>;
 
   fromWad(wad: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -133,6 +140,8 @@ export class ChainlinkOracleWrapper extends BaseContract {
   scaler(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
+    decimals(overrides?: CallOverrides): Promise<number>;
+
     deployer(overrides?: CallOverrides): Promise<string>;
 
     fromWad(wad: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -153,6 +162,8 @@ export class ChainlinkOracleWrapper extends BaseContract {
   filters: {};
 
   estimateGas: {
+    decimals(overrides?: CallOverrides): Promise<BigNumber>;
+
     deployer(overrides?: CallOverrides): Promise<BigNumber>;
 
     fromWad(wad: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -169,6 +180,8 @@ export class ChainlinkOracleWrapper extends BaseContract {
   };
 
   populateTransaction: {
+    decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     deployer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     fromWad(

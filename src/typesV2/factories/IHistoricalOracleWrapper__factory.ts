@@ -5,37 +5,11 @@
 import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
 import type {
-  IOracleWrapper,
-  IOracleWrapperInterface,
-} from "../IOracleWrapper";
+  IHistoricalOracleWrapper,
+  IHistoricalOracleWrapperInterface,
+} from "../IHistoricalOracleWrapper";
 
 const _abi = [
-  {
-    inputs: [],
-    name: "decimals",
-    outputs: [
-      {
-        internalType: "uint8",
-        name: "",
-        type: "uint8",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "deployer",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
   {
     inputs: [
       {
@@ -56,7 +30,13 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "index",
+        type: "uint256",
+      },
+    ],
     name: "getPrice",
     outputs: [
       {
@@ -100,29 +80,33 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "poll",
-    outputs: [
+    inputs: [
       {
-        internalType: "int256",
-        name: "",
-        type: "int256",
+        internalType: "address",
+        name: "_oracle",
+        type: "address",
       },
     ],
+    name: "setOracle",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
 ];
 
-export class IOracleWrapper__factory {
+export class IHistoricalOracleWrapper__factory {
   static readonly abi = _abi;
-  static createInterface(): IOracleWrapperInterface {
-    return new utils.Interface(_abi) as IOracleWrapperInterface;
+  static createInterface(): IHistoricalOracleWrapperInterface {
+    return new utils.Interface(_abi) as IHistoricalOracleWrapperInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): IOracleWrapper {
-    return new Contract(address, _abi, signerOrProvider) as IOracleWrapper;
+  ): IHistoricalOracleWrapper {
+    return new Contract(
+      address,
+      _abi,
+      signerOrProvider
+    ) as IHistoricalOracleWrapper;
   }
 }

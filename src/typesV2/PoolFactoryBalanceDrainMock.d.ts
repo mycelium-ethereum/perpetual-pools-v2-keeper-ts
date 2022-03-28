@@ -22,46 +22,35 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface PoolFactoryBalanceDrainMockInterface extends ethers.utils.Interface {
   functions: {
     "autoClaim()": FunctionFragment;
-    "burningFee()": FunctionFragment;
-    "changeInterval()": FunctionFragment;
+    "claimGovernance()": FunctionFragment;
     "deployPool(tuple)": FunctionFragment;
     "fee()": FunctionFragment;
     "feeReceiver()": FunctionFragment;
+    "governance()": FunctionFragment;
+    "governanceTransferInProgress()": FunctionFragment;
     "invariantCheck()": FunctionFragment;
     "isValidPool(address)": FunctionFragment;
     "isValidPoolCommitter(address)": FunctionFragment;
-    "maxLeverage()": FunctionFragment;
-    "mintingFee()": FunctionFragment;
     "numPools()": FunctionFragment;
-    "owner()": FunctionFragment;
-    "pairTokenBase()": FunctionFragment;
     "pairTokenBaseAddress()": FunctionFragment;
-    "poolBase()": FunctionFragment;
     "poolBaseAddress()": FunctionFragment;
-    "poolCommitterBase()": FunctionFragment;
     "poolCommitterBaseAddress()": FunctionFragment;
     "poolKeeper()": FunctionFragment;
     "pools(uint256)": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
+    "provisionalGovernance()": FunctionFragment;
     "secondaryFeeSplitPercent()": FunctionFragment;
     "setAutoClaim(address)": FunctionFragment;
     "setFee(uint256)": FunctionFragment;
     "setFeeReceiver(address)": FunctionFragment;
     "setInvariantCheck(address)": FunctionFragment;
-    "setMaxLeverage(uint16)": FunctionFragment;
-    "setMintAndBurnFeeAndChangeInterval(uint256,uint256,uint256)": FunctionFragment;
     "setPoolKeeper(address)": FunctionFragment;
     "setSecondaryFeeSplitPercent(uint256)": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
+    "transferGovernance(address)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "autoClaim", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "burningFee",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "changeInterval",
+    functionFragment: "claimGovernance",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -72,16 +61,27 @@ interface PoolFactoryBalanceDrainMockInterface extends ethers.utils.Interface {
         frontRunningInterval: BigNumberish;
         updateInterval: BigNumberish;
         leverageAmount: BigNumberish;
-        quoteToken: string;
+        settlementToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheck: string;
+        feeController: string;
+        mintingFee: BigNumberish;
+        changeInterval: BigNumberish;
+        burningFee: BigNumberish;
       }
     ]
   ): string;
   encodeFunctionData(functionFragment: "fee", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "feeReceiver",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "governance",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "governanceTransferInProgress",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -93,31 +93,13 @@ interface PoolFactoryBalanceDrainMockInterface extends ethers.utils.Interface {
     functionFragment: "isValidPoolCommitter",
     values: [string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "maxLeverage",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "mintingFee",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "numPools", values?: undefined): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "pairTokenBase",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "pairTokenBaseAddress",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "poolBase", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "poolBaseAddress",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "poolCommitterBase",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -130,7 +112,7 @@ interface PoolFactoryBalanceDrainMockInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "pools", values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
+    functionFragment: "provisionalGovernance",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -154,14 +136,6 @@ interface PoolFactoryBalanceDrainMockInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "setMaxLeverage",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMintAndBurnFeeAndChangeInterval",
-    values: [BigNumberish, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setPoolKeeper",
     values: [string]
   ): string;
@@ -170,20 +144,24 @@ interface PoolFactoryBalanceDrainMockInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferOwnership",
+    functionFragment: "transferGovernance",
     values: [string]
   ): string;
 
   decodeFunctionResult(functionFragment: "autoClaim", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "burningFee", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "changeInterval",
+    functionFragment: "claimGovernance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deployPool", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "fee", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "feeReceiver",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "governance", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "governanceTransferInProgress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -198,28 +176,13 @@ interface PoolFactoryBalanceDrainMockInterface extends ethers.utils.Interface {
     functionFragment: "isValidPoolCommitter",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "maxLeverage",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "mintingFee", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "numPools", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "pairTokenBase",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "pairTokenBaseAddress",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "poolBase", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "poolBaseAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "poolCommitterBase",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -229,7 +192,7 @@ interface PoolFactoryBalanceDrainMockInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "poolKeeper", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pools", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
+    functionFragment: "provisionalGovernance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -250,14 +213,6 @@ interface PoolFactoryBalanceDrainMockInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setMaxLeverage",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setMintAndBurnFeeAndChangeInterval",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "setPoolKeeper",
     data: BytesLike
   ): Result;
@@ -266,28 +221,38 @@ interface PoolFactoryBalanceDrainMockInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "transferOwnership",
+    functionFragment: "transferGovernance",
     data: BytesLike
   ): Result;
 
   events: {
+    "AutoClaimChanged(address)": EventFragment;
+    "DeployCommitter(address,address,address,uint256,address)": EventFragment;
     "DeployPool(address,address,string)": EventFragment;
     "FeeChanged(uint256)": EventFragment;
     "FeeReceiverChanged(address)": EventFragment;
+    "GovernanceAddressChanged(address,address)": EventFragment;
+    "InvariantCheckChanged(address)": EventFragment;
     "MaxLeverageChanged(uint256)": EventFragment;
     "MintAndBurnFeesChanged(uint256,uint256)": EventFragment;
-    "OwnershipTransferred(address,address)": EventFragment;
     "PoolKeeperChanged(address)": EventFragment;
+    "ProvisionalGovernanceChanged(address)": EventFragment;
     "SecondaryFeeSplitChanged(uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AutoClaimChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DeployCommitter"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "DeployPool"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FeeChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FeeReceiverChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "GovernanceAddressChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "InvariantCheckChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MaxLeverageChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MintAndBurnFeesChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolKeeperChanged"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "ProvisionalGovernanceChanged"
+  ): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SecondaryFeeSplitChanged"): EventFragment;
 }
 
@@ -337,9 +302,9 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
   functions: {
     autoClaim(overrides?: CallOverrides): Promise<[string]>;
 
-    burningFee(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    changeInterval(overrides?: CallOverrides): Promise<[BigNumber]>;
+    claimGovernance(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     deployPool(
       deploymentParameters: {
@@ -347,10 +312,13 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
         frontRunningInterval: BigNumberish;
         updateInterval: BigNumberish;
         leverageAmount: BigNumberish;
-        quoteToken: string;
+        settlementToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheck: string;
+        feeController: string;
+        mintingFee: BigNumberish;
+        changeInterval: BigNumberish;
+        burningFee: BigNumberish;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -358,6 +326,10 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
     fee(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     feeReceiver(overrides?: CallOverrides): Promise<[string]>;
+
+    governance(overrides?: CallOverrides): Promise<[string]>;
+
+    governanceTransferInProgress(overrides?: CallOverrides): Promise<[boolean]>;
 
     invariantCheck(overrides?: CallOverrides): Promise<[string]>;
 
@@ -368,23 +340,11 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    maxLeverage(overrides?: CallOverrides): Promise<[number]>;
-
-    mintingFee(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     numPools(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    owner(overrides?: CallOverrides): Promise<[string]>;
-
-    pairTokenBase(overrides?: CallOverrides): Promise<[string]>;
 
     pairTokenBaseAddress(overrides?: CallOverrides): Promise<[string]>;
 
-    poolBase(overrides?: CallOverrides): Promise<[string]>;
-
     poolBaseAddress(overrides?: CallOverrides): Promise<[string]>;
-
-    poolCommitterBase(overrides?: CallOverrides): Promise<[string]>;
 
     poolCommitterBaseAddress(overrides?: CallOverrides): Promise<[string]>;
 
@@ -392,9 +352,7 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
 
     pools(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
-    renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    provisionalGovernance(overrides?: CallOverrides): Promise<[string]>;
 
     secondaryFeeSplitPercent(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -418,18 +376,6 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setMaxLeverage(
-      newMaxLeverage: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setMintAndBurnFeeAndChangeInterval(
-      _mintingFee: BigNumberish,
-      _burningFee: BigNumberish,
-      _changeInterval: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     setPoolKeeper(
       _poolKeeper: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -440,17 +386,17 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    transferOwnership(
-      newOwner: string,
+    transferGovernance(
+      _governance: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
   autoClaim(overrides?: CallOverrides): Promise<string>;
 
-  burningFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-  changeInterval(overrides?: CallOverrides): Promise<BigNumber>;
+  claimGovernance(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   deployPool(
     deploymentParameters: {
@@ -458,10 +404,13 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       frontRunningInterval: BigNumberish;
       updateInterval: BigNumberish;
       leverageAmount: BigNumberish;
-      quoteToken: string;
+      settlementToken: string;
       oracleWrapper: string;
       settlementEthOracle: string;
-      invariantCheck: string;
+      feeController: string;
+      mintingFee: BigNumberish;
+      changeInterval: BigNumberish;
+      burningFee: BigNumberish;
     },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -469,6 +418,10 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
   fee(overrides?: CallOverrides): Promise<BigNumber>;
 
   feeReceiver(overrides?: CallOverrides): Promise<string>;
+
+  governance(overrides?: CallOverrides): Promise<string>;
+
+  governanceTransferInProgress(overrides?: CallOverrides): Promise<boolean>;
 
   invariantCheck(overrides?: CallOverrides): Promise<string>;
 
@@ -479,23 +432,11 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  maxLeverage(overrides?: CallOverrides): Promise<number>;
-
-  mintingFee(overrides?: CallOverrides): Promise<BigNumber>;
-
   numPools(overrides?: CallOverrides): Promise<BigNumber>;
-
-  owner(overrides?: CallOverrides): Promise<string>;
-
-  pairTokenBase(overrides?: CallOverrides): Promise<string>;
 
   pairTokenBaseAddress(overrides?: CallOverrides): Promise<string>;
 
-  poolBase(overrides?: CallOverrides): Promise<string>;
-
   poolBaseAddress(overrides?: CallOverrides): Promise<string>;
-
-  poolCommitterBase(overrides?: CallOverrides): Promise<string>;
 
   poolCommitterBaseAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -503,9 +444,7 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
 
   pools(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  renounceOwnership(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  provisionalGovernance(overrides?: CallOverrides): Promise<string>;
 
   secondaryFeeSplitPercent(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -529,18 +468,6 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setMaxLeverage(
-    newMaxLeverage: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setMintAndBurnFeeAndChangeInterval(
-    _mintingFee: BigNumberish,
-    _burningFee: BigNumberish,
-    _changeInterval: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   setPoolKeeper(
     _poolKeeper: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -551,17 +478,15 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  transferOwnership(
-    newOwner: string,
+  transferGovernance(
+    _governance: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
     autoClaim(overrides?: CallOverrides): Promise<string>;
 
-    burningFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    changeInterval(overrides?: CallOverrides): Promise<BigNumber>;
+    claimGovernance(overrides?: CallOverrides): Promise<void>;
 
     deployPool(
       deploymentParameters: {
@@ -569,10 +494,13 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
         frontRunningInterval: BigNumberish;
         updateInterval: BigNumberish;
         leverageAmount: BigNumberish;
-        quoteToken: string;
+        settlementToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheck: string;
+        feeController: string;
+        mintingFee: BigNumberish;
+        changeInterval: BigNumberish;
+        burningFee: BigNumberish;
       },
       overrides?: CallOverrides
     ): Promise<string>;
@@ -580,6 +508,10 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
     fee(overrides?: CallOverrides): Promise<BigNumber>;
 
     feeReceiver(overrides?: CallOverrides): Promise<string>;
+
+    governance(overrides?: CallOverrides): Promise<string>;
+
+    governanceTransferInProgress(overrides?: CallOverrides): Promise<boolean>;
 
     invariantCheck(overrides?: CallOverrides): Promise<string>;
 
@@ -590,23 +522,11 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    maxLeverage(overrides?: CallOverrides): Promise<number>;
-
-    mintingFee(overrides?: CallOverrides): Promise<BigNumber>;
-
     numPools(overrides?: CallOverrides): Promise<BigNumber>;
-
-    owner(overrides?: CallOverrides): Promise<string>;
-
-    pairTokenBase(overrides?: CallOverrides): Promise<string>;
 
     pairTokenBaseAddress(overrides?: CallOverrides): Promise<string>;
 
-    poolBase(overrides?: CallOverrides): Promise<string>;
-
     poolBaseAddress(overrides?: CallOverrides): Promise<string>;
-
-    poolCommitterBase(overrides?: CallOverrides): Promise<string>;
 
     poolCommitterBaseAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -614,7 +534,7 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
 
     pools(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
+    provisionalGovernance(overrides?: CallOverrides): Promise<string>;
 
     secondaryFeeSplitPercent(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -632,18 +552,6 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setMaxLeverage(
-      newMaxLeverage: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setMintAndBurnFeeAndChangeInterval(
-      _mintingFee: BigNumberish,
-      _burningFee: BigNumberish,
-      _changeInterval: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     setPoolKeeper(
       _poolKeeper: string,
       overrides?: CallOverrides
@@ -654,13 +562,34 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    transferOwnership(
-      newOwner: string,
+    transferGovernance(
+      _governance: string,
       overrides?: CallOverrides
     ): Promise<void>;
   };
 
   filters: {
+    AutoClaimChanged(
+      autoClaim?: string | null
+    ): TypedEventFilter<[string], { autoClaim: string }>;
+
+    DeployCommitter(
+      poolCommitterAddress?: null,
+      quoteToken?: null,
+      pool?: null,
+      changeInterval?: null,
+      feeController?: null
+    ): TypedEventFilter<
+      [string, string, string, BigNumber, string],
+      {
+        poolCommitterAddress: string;
+        quoteToken: string;
+        pool: string;
+        changeInterval: BigNumber;
+        feeController: string;
+      }
+    >;
+
     DeployPool(
       pool?: string | null,
       poolCommitter?: null,
@@ -678,6 +607,18 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       receiver?: string | null
     ): TypedEventFilter<[string], { receiver: string }>;
 
+    GovernanceAddressChanged(
+      oldAddress?: string | null,
+      newAddress?: string | null
+    ): TypedEventFilter<
+      [string, string],
+      { oldAddress: string; newAddress: string }
+    >;
+
+    InvariantCheckChanged(
+      invariantCheck?: string | null
+    ): TypedEventFilter<[string], { invariantCheck: string }>;
+
     MaxLeverageChanged(
       leverage?: BigNumberish | null
     ): TypedEventFilter<[BigNumber], { leverage: BigNumber }>;
@@ -690,17 +631,13 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       { mint: BigNumber; burn: BigNumber }
     >;
 
-    OwnershipTransferred(
-      previousOwner?: string | null,
-      newOwner?: string | null
-    ): TypedEventFilter<
-      [string, string],
-      { previousOwner: string; newOwner: string }
-    >;
-
     PoolKeeperChanged(
       _poolKeeper?: null
     ): TypedEventFilter<[string], { _poolKeeper: string }>;
+
+    ProvisionalGovernanceChanged(
+      newAddress?: string | null
+    ): TypedEventFilter<[string], { newAddress: string }>;
 
     SecondaryFeeSplitChanged(
       fee?: BigNumberish | null
@@ -710,9 +647,9 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
   estimateGas: {
     autoClaim(overrides?: CallOverrides): Promise<BigNumber>;
 
-    burningFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    changeInterval(overrides?: CallOverrides): Promise<BigNumber>;
+    claimGovernance(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     deployPool(
       deploymentParameters: {
@@ -720,10 +657,13 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
         frontRunningInterval: BigNumberish;
         updateInterval: BigNumberish;
         leverageAmount: BigNumberish;
-        quoteToken: string;
+        settlementToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheck: string;
+        feeController: string;
+        mintingFee: BigNumberish;
+        changeInterval: BigNumberish;
+        burningFee: BigNumberish;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -731,6 +671,10 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
     fee(overrides?: CallOverrides): Promise<BigNumber>;
 
     feeReceiver(overrides?: CallOverrides): Promise<BigNumber>;
+
+    governance(overrides?: CallOverrides): Promise<BigNumber>;
+
+    governanceTransferInProgress(overrides?: CallOverrides): Promise<BigNumber>;
 
     invariantCheck(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -741,23 +685,11 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    maxLeverage(overrides?: CallOverrides): Promise<BigNumber>;
-
-    mintingFee(overrides?: CallOverrides): Promise<BigNumber>;
-
     numPools(overrides?: CallOverrides): Promise<BigNumber>;
-
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    pairTokenBase(overrides?: CallOverrides): Promise<BigNumber>;
 
     pairTokenBaseAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
-    poolBase(overrides?: CallOverrides): Promise<BigNumber>;
-
     poolBaseAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
-    poolCommitterBase(overrides?: CallOverrides): Promise<BigNumber>;
 
     poolCommitterBaseAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -765,9 +697,7 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
 
     pools(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-    renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    provisionalGovernance(overrides?: CallOverrides): Promise<BigNumber>;
 
     secondaryFeeSplitPercent(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -791,18 +721,6 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setMaxLeverage(
-      newMaxLeverage: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setMintAndBurnFeeAndChangeInterval(
-      _mintingFee: BigNumberish,
-      _burningFee: BigNumberish,
-      _changeInterval: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     setPoolKeeper(
       _poolKeeper: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -813,8 +731,8 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    transferOwnership(
-      newOwner: string,
+    transferGovernance(
+      _governance: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -822,9 +740,9 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
   populateTransaction: {
     autoClaim(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    burningFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    changeInterval(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    claimGovernance(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     deployPool(
       deploymentParameters: {
@@ -832,10 +750,13 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
         frontRunningInterval: BigNumberish;
         updateInterval: BigNumberish;
         leverageAmount: BigNumberish;
-        quoteToken: string;
+        settlementToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheck: string;
+        feeController: string;
+        mintingFee: BigNumberish;
+        changeInterval: BigNumberish;
+        burningFee: BigNumberish;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -843,6 +764,12 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
     fee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     feeReceiver(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    governance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    governanceTransferInProgress(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     invariantCheck(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -856,25 +783,13 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    maxLeverage(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    mintingFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     numPools(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    pairTokenBase(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pairTokenBaseAddress(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    poolBase(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     poolBaseAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    poolCommitterBase(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     poolCommitterBaseAddress(
       overrides?: CallOverrides
@@ -887,8 +802,8 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
+    provisionalGovernance(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     secondaryFeeSplitPercent(
@@ -915,18 +830,6 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setMaxLeverage(
-      newMaxLeverage: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setMintAndBurnFeeAndChangeInterval(
-      _mintingFee: BigNumberish,
-      _burningFee: BigNumberish,
-      _changeInterval: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     setPoolKeeper(
       _poolKeeper: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -937,8 +840,8 @@ export class PoolFactoryBalanceDrainMock extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    transferOwnership(
-      newOwner: string,
+    transferGovernance(
+      _governance: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

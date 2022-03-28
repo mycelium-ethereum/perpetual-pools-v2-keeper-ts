@@ -127,19 +127,6 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "observer",
-        type: "address",
-      },
-    ],
-    name: "PriceObserverChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
         name: "pool",
         type: "address",
       },
@@ -233,34 +220,11 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_pool",
+        name: "pool",
         type: "address",
-      },
-      {
-        internalType: "bool",
-        name: "boundedIntervals",
-        type: "bool",
-      },
-      {
-        internalType: "uint256",
-        name: "numberOfIntervals",
-        type: "uint256",
       },
     ],
     name: "performUpkeepSinglePool",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_factory",
-        type: "address",
-      },
-    ],
-    name: "setFactory",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

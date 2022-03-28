@@ -40,11 +40,7 @@ interface IPriceObserverInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "getAll", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "length", data: BytesLike): Result;
 
-  events: {
-    "WriterChanged(address)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "WriterChanged"): EventFragment;
+  events: {};
 }
 
 export class IPriceObserver extends BaseContract {
@@ -219,11 +215,7 @@ export class IPriceObserver extends BaseContract {
     length(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
-  filters: {
-    WriterChanged(
-      writer?: string | null
-    ): TypedEventFilter<[string], { writer: string }>;
-  };
+  filters: {};
 
   estimateGas: {
     add(

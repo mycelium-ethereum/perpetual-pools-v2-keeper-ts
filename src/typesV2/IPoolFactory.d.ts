@@ -30,8 +30,6 @@ interface IPoolFactoryInterface extends ethers.utils.Interface {
     "setFee(uint256)": FunctionFragment;
     "setFeeReceiver(address)": FunctionFragment;
     "setInvariantCheck(address)": FunctionFragment;
-    "setMaxLeverage(uint16)": FunctionFragment;
-    "setMintAndBurnFeeAndChangeInterval(uint256,uint256,uint256)": FunctionFragment;
     "setPoolKeeper(address)": FunctionFragment;
     "setSecondaryFeeSplitPercent(uint256)": FunctionFragment;
   };
@@ -44,10 +42,13 @@ interface IPoolFactoryInterface extends ethers.utils.Interface {
         frontRunningInterval: BigNumberish;
         updateInterval: BigNumberish;
         leverageAmount: BigNumberish;
-        quoteToken: string;
+        settlementToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheck: string;
+        feeController: string;
+        mintingFee: BigNumberish;
+        changeInterval: BigNumberish;
+        burningFee: BigNumberish;
       }
     ]
   ): string;
@@ -73,14 +74,6 @@ interface IPoolFactoryInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "setInvariantCheck",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMaxLeverage",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMintAndBurnFeeAndChangeInterval",
-    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setPoolKeeper",
@@ -116,14 +109,6 @@ interface IPoolFactoryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setMaxLeverage",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setMintAndBurnFeeAndChangeInterval",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "setPoolKeeper",
     data: BytesLike
   ): Result;
@@ -133,18 +118,24 @@ interface IPoolFactoryInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
+    "AutoClaimChanged(address)": EventFragment;
+    "DeployCommitter(address,address,address,uint256,address)": EventFragment;
     "DeployPool(address,address,string)": EventFragment;
     "FeeChanged(uint256)": EventFragment;
     "FeeReceiverChanged(address)": EventFragment;
+    "InvariantCheckChanged(address)": EventFragment;
     "MaxLeverageChanged(uint256)": EventFragment;
     "MintAndBurnFeesChanged(uint256,uint256)": EventFragment;
     "PoolKeeperChanged(address)": EventFragment;
     "SecondaryFeeSplitChanged(uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AutoClaimChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DeployCommitter"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "DeployPool"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FeeChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FeeReceiverChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "InvariantCheckChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MaxLeverageChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MintAndBurnFeesChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolKeeperChanged"): EventFragment;
@@ -201,10 +192,13 @@ export class IPoolFactory extends BaseContract {
         frontRunningInterval: BigNumberish;
         updateInterval: BigNumberish;
         leverageAmount: BigNumberish;
-        quoteToken: string;
+        settlementToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheck: string;
+        feeController: string;
+        mintingFee: BigNumberish;
+        changeInterval: BigNumberish;
+        burningFee: BigNumberish;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -240,18 +234,6 @@ export class IPoolFactory extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setMaxLeverage(
-      newMaxLeverage: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setMintAndBurnFeeAndChangeInterval(
-      _mintingFee: BigNumberish,
-      _burningFee: BigNumberish,
-      _changeInterval: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     setPoolKeeper(
       _poolKeeper: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -269,10 +251,13 @@ export class IPoolFactory extends BaseContract {
       frontRunningInterval: BigNumberish;
       updateInterval: BigNumberish;
       leverageAmount: BigNumberish;
-      quoteToken: string;
+      settlementToken: string;
       oracleWrapper: string;
       settlementEthOracle: string;
-      invariantCheck: string;
+      feeController: string;
+      mintingFee: BigNumberish;
+      changeInterval: BigNumberish;
+      burningFee: BigNumberish;
     },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -308,18 +293,6 @@ export class IPoolFactory extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setMaxLeverage(
-    newMaxLeverage: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setMintAndBurnFeeAndChangeInterval(
-    _mintingFee: BigNumberish,
-    _burningFee: BigNumberish,
-    _changeInterval: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   setPoolKeeper(
     _poolKeeper: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -337,10 +310,13 @@ export class IPoolFactory extends BaseContract {
         frontRunningInterval: BigNumberish;
         updateInterval: BigNumberish;
         leverageAmount: BigNumberish;
-        quoteToken: string;
+        settlementToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheck: string;
+        feeController: string;
+        mintingFee: BigNumberish;
+        changeInterval: BigNumberish;
+        burningFee: BigNumberish;
       },
       overrides?: CallOverrides
     ): Promise<string>;
@@ -370,18 +346,6 @@ export class IPoolFactory extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setMaxLeverage(
-      newMaxLeverage: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setMintAndBurnFeeAndChangeInterval(
-      _mintingFee: BigNumberish,
-      _burningFee: BigNumberish,
-      _changeInterval: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     setPoolKeeper(
       _poolKeeper: string,
       overrides?: CallOverrides
@@ -394,6 +358,27 @@ export class IPoolFactory extends BaseContract {
   };
 
   filters: {
+    AutoClaimChanged(
+      autoClaim?: string | null
+    ): TypedEventFilter<[string], { autoClaim: string }>;
+
+    DeployCommitter(
+      poolCommitterAddress?: null,
+      quoteToken?: null,
+      pool?: null,
+      changeInterval?: null,
+      feeController?: null
+    ): TypedEventFilter<
+      [string, string, string, BigNumber, string],
+      {
+        poolCommitterAddress: string;
+        quoteToken: string;
+        pool: string;
+        changeInterval: BigNumber;
+        feeController: string;
+      }
+    >;
+
     DeployPool(
       pool?: string | null,
       poolCommitter?: null,
@@ -410,6 +395,10 @@ export class IPoolFactory extends BaseContract {
     FeeReceiverChanged(
       receiver?: string | null
     ): TypedEventFilter<[string], { receiver: string }>;
+
+    InvariantCheckChanged(
+      invariantCheck?: string | null
+    ): TypedEventFilter<[string], { invariantCheck: string }>;
 
     MaxLeverageChanged(
       leverage?: BigNumberish | null
@@ -439,10 +428,13 @@ export class IPoolFactory extends BaseContract {
         frontRunningInterval: BigNumberish;
         updateInterval: BigNumberish;
         leverageAmount: BigNumberish;
-        quoteToken: string;
+        settlementToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheck: string;
+        feeController: string;
+        mintingFee: BigNumberish;
+        changeInterval: BigNumberish;
+        burningFee: BigNumberish;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -478,18 +470,6 @@ export class IPoolFactory extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setMaxLeverage(
-      newMaxLeverage: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setMintAndBurnFeeAndChangeInterval(
-      _mintingFee: BigNumberish,
-      _burningFee: BigNumberish,
-      _changeInterval: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     setPoolKeeper(
       _poolKeeper: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -508,10 +488,13 @@ export class IPoolFactory extends BaseContract {
         frontRunningInterval: BigNumberish;
         updateInterval: BigNumberish;
         leverageAmount: BigNumberish;
-        quoteToken: string;
+        settlementToken: string;
         oracleWrapper: string;
         settlementEthOracle: string;
-        invariantCheck: string;
+        feeController: string;
+        mintingFee: BigNumberish;
+        changeInterval: BigNumberish;
+        burningFee: BigNumberish;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -550,18 +533,6 @@ export class IPoolFactory extends BaseContract {
 
     setInvariantCheck(
       _invariantCheck: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setMaxLeverage(
-      newMaxLeverage: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setMintAndBurnFeeAndChangeInterval(
-      _mintingFee: BigNumberish,
-      _burningFee: BigNumberish,
-      _changeInterval: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -36,14 +36,11 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
     "keeperReward(address,uint256,uint256,uint256,uint256)": FunctionFragment;
     "keeperTip(uint256,uint256)": FunctionFragment;
     "newPool(address)": FunctionFragment;
-    "observer()": FunctionFragment;
     "owner()": FunctionFragment;
     "performUpkeepMultiplePools(address[])": FunctionFragment;
-    "performUpkeepSinglePool(address,bool,uint256)": FunctionFragment;
+    "performUpkeepSinglePool(address)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "setFactory(address)": FunctionFragment;
     "setGasPrice(uint256)": FunctionFragment;
-    "setPriceObserver(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
 
@@ -92,7 +89,6 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "newPool", values: [string]): string;
-  encodeFunctionData(functionFragment: "observer", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "performUpkeepMultiplePools",
@@ -100,20 +96,15 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "performUpkeepSinglePool",
-    values: [string, boolean, BigNumberish]
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "setFactory", values: [string]): string;
   encodeFunctionData(
     functionFragment: "setGasPrice",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPriceObserver",
-    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -156,7 +147,6 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "keeperTip", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "newPool", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "observer", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "performUpkeepMultiplePools",
@@ -170,13 +160,8 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setFactory", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setGasPrice",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setPriceObserver",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -192,7 +177,6 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
     "OwnershipTransferred(address,address)": EventFragment;
     "PoolAdded(address,int256)": EventFragment;
     "PoolUpkeepError(address,string)": EventFragment;
-    "PriceObserverChanged(address)": EventFragment;
     "UpkeepSuccessful(address,bytes,int256,int256)": EventFragment;
   };
 
@@ -203,7 +187,6 @@ interface PoolKeeperInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PoolUpkeepError"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "PriceObserverChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpkeepSuccessful"): EventFragment;
 }
 
@@ -309,8 +292,6 @@ export class PoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    observer(overrides?: CallOverrides): Promise<[string]>;
-
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     performUpkeepMultiplePools(
@@ -320,8 +301,6 @@ export class PoolKeeper extends BaseContract {
 
     performUpkeepSinglePool(
       _pool: string,
-      _boundedIntervals: boolean,
-      _numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -329,18 +308,8 @@ export class PoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setFactory(
-      _factory: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     setGasPrice(
       _price: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setPriceObserver(
-      _observer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -405,8 +374,6 @@ export class PoolKeeper extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  observer(overrides?: CallOverrides): Promise<string>;
-
   owner(overrides?: CallOverrides): Promise<string>;
 
   performUpkeepMultiplePools(
@@ -416,8 +383,6 @@ export class PoolKeeper extends BaseContract {
 
   performUpkeepSinglePool(
     _pool: string,
-    _boundedIntervals: boolean,
-    _numberOfIntervals: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -425,18 +390,8 @@ export class PoolKeeper extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setFactory(
-    _factory: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   setGasPrice(
     _price: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setPriceObserver(
-    _observer: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -498,8 +453,6 @@ export class PoolKeeper extends BaseContract {
 
     newPool(_poolAddress: string, overrides?: CallOverrides): Promise<void>;
 
-    observer(overrides?: CallOverrides): Promise<string>;
-
     owner(overrides?: CallOverrides): Promise<string>;
 
     performUpkeepMultiplePools(
@@ -509,21 +462,12 @@ export class PoolKeeper extends BaseContract {
 
     performUpkeepSinglePool(
       _pool: string,
-      _boundedIntervals: boolean,
-      _numberOfIntervals: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    setFactory(_factory: string, overrides?: CallOverrides): Promise<void>;
-
     setGasPrice(_price: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    setPriceObserver(
-      _observer: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     transferOwnership(
       newOwner: string,
@@ -578,10 +522,6 @@ export class PoolKeeper extends BaseContract {
       pool?: string | null,
       reason?: null
     ): TypedEventFilter<[string, string], { pool: string; reason: string }>;
-
-    PriceObserverChanged(
-      observer?: string | null
-    ): TypedEventFilter<[string], { observer: string }>;
 
     UpkeepSuccessful(
       pool?: string | null,
@@ -650,8 +590,6 @@ export class PoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    observer(overrides?: CallOverrides): Promise<BigNumber>;
-
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     performUpkeepMultiplePools(
@@ -661,8 +599,6 @@ export class PoolKeeper extends BaseContract {
 
     performUpkeepSinglePool(
       _pool: string,
-      _boundedIntervals: boolean,
-      _numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -670,18 +606,8 @@ export class PoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setFactory(
-      _factory: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     setGasPrice(
       _price: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setPriceObserver(
-      _observer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -754,8 +680,6 @@ export class PoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    observer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     performUpkeepMultiplePools(
@@ -765,8 +689,6 @@ export class PoolKeeper extends BaseContract {
 
     performUpkeepSinglePool(
       _pool: string,
-      _boundedIntervals: boolean,
-      _numberOfIntervals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -774,18 +696,8 @@ export class PoolKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setFactory(
-      _factory: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     setGasPrice(
       _price: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setPriceObserver(
-      _observer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
