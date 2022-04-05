@@ -6,7 +6,7 @@ import {
   PoolKeeper__factory,
   PoolFactory__factory,
   PoolFactory
-} from './typesV2';
+} from '@tracer-protocol/perpetual-pools-contracts/types';
 import { attemptPromiseRecursively } from './utils';
 
 type KeeperConstructorArgs = {
