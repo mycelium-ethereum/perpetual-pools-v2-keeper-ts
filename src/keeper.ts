@@ -11,6 +11,7 @@ import { attemptPromiseRecursively } from './utils';
 
 type KeeperConstructorArgs = {
   poolFactoryAddress: string,
+  poolFactoryDeployedAtBlock: number,
   nodeUrl: string,
   privateKey: string,
   skipPools: { [poolAddress: string]: boolean },
@@ -31,6 +32,7 @@ class Keeper {
   provider: ethers.providers.BaseProvider
   wallet: ethers.Wallet
   poolFactoryInstance: PoolFactory
+  poolFactoryDeployedAtBlock: number
   watchedPools: Record<string, WatchedPool>
   keeperInstances: Record<string, PoolKeeper>
   scheduledUpkeeps: Record<string, Record<string, { pools: string[], upkeepPromise: Promise<void> }>>
@@ -38,9 +40,17 @@ class Keeper {
   onChainTimestamp: number
   gasLimit: number
 
-  constructor ({ nodeUrl, privateKey, skipPools, gasLimit, poolFactoryAddress }: KeeperConstructorArgs) {
+  constructor ({
+    nodeUrl,
+    privateKey,
+    skipPools,
+    gasLimit,
+    poolFactoryAddress,
+    poolFactoryDeployedAtBlock
+  }: KeeperConstructorArgs) {
     this.provider = ethers.getDefaultProvider(nodeUrl);
     this.poolFactoryInstance = PoolFactory__factory.connect(poolFactoryAddress, this.provider);
+    this.poolFactoryDeployedAtBlock = poolFactoryDeployedAtBlock;
     this.wallet = new ethers.Wallet(privateKey, this.provider);
     this.onChainTimestamp = 0;
     this.watchedPools = {};
@@ -58,7 +68,10 @@ class Keeper {
 
     const deployPoolEventsFilter = this.poolFactoryInstance.filters.DeployPool();
 
-    const deployPoolEvents = await this.poolFactoryInstance.queryFilter(deployPoolEventsFilter);
+    const deployPoolEvents = await this.poolFactoryInstance.queryFilter(
+      deployPoolEventsFilter,
+      this.poolFactoryDeployedAtBlock
+    );
 
     for (const event of deployPoolEvents) {
       await this.initializeWatchedPool(event.args.pool);

@@ -7,6 +7,7 @@ async function main () {
   const keeper = new Keeper({
     privateKey: process.env.PRIVATE_KEY as string,
     poolFactoryAddress: process.env.POOL_FACTORY_ADDRESS as string,
+    poolFactoryDeployedAtBlock: Number(process.env.POOL_FACTORY_DEPLOYED_AT_BLOCK || 0),
     nodeUrl: process.env.NODE_URL as string,
     skipPools: {},
     gasLimit: Number(process.env.GAS_LIMIT || 5000000)
