@@ -1318,10 +1318,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@tracer-protocol/perpetual-pools-contracts@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.npmjs.org/@tracer-protocol/perpetual-pools-contracts/-/perpetual-pools-contracts-1.1.2.tgz#7bccd91476f1e271f3ee518c8fd84725ef4fbc16"
-  integrity sha512-KFnlh6jOOlpgLWgVg2pChKP2sHGZ3oBTO5yh4Dfcx2Q7foxA/9qr2M0dt0IZICHIxfcLZcaxHAmiCKKOC6HBEw==
+"@tracer-protocol/perpetual-pools-contracts@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.npmjs.org/@tracer-protocol/perpetual-pools-contracts/-/perpetual-pools-contracts-1.2.3.tgz#ccf661cb88572074e0293f2aefe603bcf5cc9fef"
+  integrity sha512-5MpVa1oAdc9oCXMXSJlY6owoulgIzurkoOatwNbaTr4WqAphj1RcI8xVEbKnaIVGHN2p43TbAXLCzpO9BI4bLg==
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.8"
