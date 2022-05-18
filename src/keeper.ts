@@ -74,7 +74,9 @@ class Keeper {
     );
 
     for (const event of deployPoolEvents) {
-      await this.initializeWatchedPool(event.args.pool);
+      if (!this.skipPools[ethers.utils.getAddress(event.args.pool)]) {
+        await this.initializeWatchedPool(event.args.pool);
+      }
     }
   }
 
