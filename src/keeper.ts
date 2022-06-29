@@ -7,7 +7,7 @@ import {
   PoolFactory__factory,
   PoolFactory
 } from '@tracer-protocol/perpetual-pools-contracts/types';
-import { attemptPromiseRecursively } from './utils';
+import { asyncInterval, attemptPromiseRecursively, nowFormatted } from './utils';
 
 type KeeperConstructorArgs = {
   poolFactoryAddress: string,
@@ -81,7 +81,7 @@ class Keeper {
   }
 
   initializeWatchedPool (poolAddress: string) {
-    console.log(`initializing ${poolAddress} as a watched pool`);
+    console.log(`[${nowFormatted()}] initializing ${poolAddress} as a watched pool`);
     return attemptPromiseRecursively({
       promise: async () => {
         const poolInstance = LeveragedPool__factory.connect(poolAddress, this.provider);
@@ -124,8 +124,7 @@ class Keeper {
     for (const poolAddress in this.watchedPools) {
       const { keeperAddress, nextUpkeepDue, isBusy } = this.watchedPools[poolAddress];
 
-      // add a buffer because of arbitrum block time jank
-      if (!isBusy && nextUpkeepDue + 5 <= now) {
+      if (!isBusy && nextUpkeepDue <= now) {
         // mark watched pool as busy
         this.watchedPools[poolAddress].isBusy = true;
 
@@ -138,17 +137,29 @@ class Keeper {
       const keeperInstance = this.keeperInstances[keeperAddress];
       const poolsDue = dueForUpkeepByKeeperAddress[keeperAddress];
 
+      console.log(`[${nowFormatted()}] ${JSON.stringify(poolsDue.map(pool => pool.address))} are due for upkeep by keeper ${keeperAddress}`);
+
       // find the pool that was last upkeep the most recently
       const mostRecentlyDuePool = poolsDue.sort((a, b) => b.nextUpkeepDue - a.nextUpkeepDue)[0];
+
+      console.log(`[${nowFormatted()}] ${mostRecentlyDuePool.address} is due next at ${new Date(mostRecentlyDuePool.nextUpkeepDue * 1000).toLocaleString()}`);
 
       // wait until most recently due pool can be upkept according to on-chain time
       attemptPromiseRecursively({
         promise: async () => {
+          console.log(`[${nowFormatted()}] checking upkeep required for pool ${mostRecentlyDuePool.address}`);
+
           const readyForUpkeep = await keeperInstance.isUpkeepRequiredSinglePool(mostRecentlyDuePool.address);
 
           if (!readyForUpkeep) {
+            // prevent getting stuck here if someone else upkeeps it
+            const lastPriceTimestamp = await mostRecentlyDuePool.contractInstance.lastPriceTimestamp();
+            if (lastPriceTimestamp.toNumber() > now) {
+              console.log(`[${nowFormatted()}] ${mostRecentlyDuePool.address} was upkept elsewhere`);
+              return;
+            }
             // attemptPromiseRecursively will retry after 1 second
-            throw new Error('Pool not ready for upkeep yet');
+            throw new Error(`[${nowFormatted()}] ${mostRecentlyDuePool.address} not ready for upkeep yet`);
           }
         }
       })
@@ -167,35 +178,48 @@ class Keeper {
             }
           });
         })
-        .then(async () => {
-          const promises = poolsDue.map(async ({ address, contractInstance }) => {
-            return attemptPromiseRecursively({
+        .then(() => {
+          // dont need to wait for this
+          for (const { address, contractInstance } of poolsDue) {
+            attemptPromiseRecursively({
+              label: `updating last price timestamp for pool ${address}`,
               promise: async () => {
                 // fetch new lastPriceTimestamp
-                const lastPriceTimestamp = await contractInstance.lastPriceTimestamp();
+                return contractInstance.lastPriceTimestamp();
+              }
+            })
+              .then(lastPriceTimestamp => {
                 const lastPriceTimestampNumber = lastPriceTimestamp.toNumber();
-
-                console.log(`COMPLETE UPKEEP FOR POOL ${address}, OLD LAST PRICE TIMESTAMP WAS ${this.watchedPools[address].lastPriceTimestamp}`);
 
                 this.watchedPools[address].isBusy = false;
                 this.watchedPools[address].nextUpkeepDue = lastPriceTimestampNumber + this.watchedPools[address].updateInterval;
                 this.watchedPools[address].lastPriceTimestamp = lastPriceTimestampNumber;
 
-                console.log(`COMPLETE UPKEEP FOR POOL ${address}, NEW LAST PRICE TIMESTAMP IS ${this.watchedPools[address].lastPriceTimestamp}`);
-              }
-            });
-          });
-
-          await Promise.all(promises);
+                console.log(`[${nowFormatted()}] ${address} upkept at ${this.watchedPools[address].lastPriceTimestamp}, next due at ${this.watchedPools[address].nextUpkeepDue}`);
+              });
+          };
         })
-        .catch(error => {
-          console.error(error);
+        .finally(() => {
+          console.log(`[${nowFormatted()}] finished upkeep interval`);
         });
     }
   }
 
   startUpkeeping ({ interval }: { interval: number }) {
-    setInterval(this.processDueUpkeeps.bind(this), interval);
+    console.log(`[${nowFormatted()}] starting upkeeping interval`);
+
+    try {
+      asyncInterval({
+        fn: async () => this.processDueUpkeeps.bind(this)(),
+        delayMs: interval,
+        runImmediately: true,
+        onError: (error) => {
+          console.error(`[${nowFormatted()}: asyncInterval] ${error.message}`);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   startWatchingForNewPools () {
