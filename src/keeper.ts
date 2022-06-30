@@ -148,28 +148,26 @@ class Keeper {
         console.log(`[${nowFormatted()}] ${mostRecentlyDuePool.address} is due next at ${new Date(mostRecentlyDuePool.nextUpkeepDue * 1000).toLocaleString()}`);
 
         // wait until most recently due pool can be upkept according to on-chain time
-        const processUpkeepForKeeper = attemptPromiseRecursively({
-          promise: async () => {
-            console.log(`[${nowFormatted()}] checking upkeep required for pool ${mostRecentlyDuePool.address}`);
+        const processUpkeepForKeeper = async () => {
+          try {
+            // ensure at least one pool is actually ready to be upkept
+            await attemptPromiseRecursively({
+              promise: async () => {
+                console.log(`[${nowFormatted()}] checking upkeep required for pool ${mostRecentlyDuePool.address}`);
 
-            const readyForUpkeep = await keeperInstance.isUpkeepRequiredSinglePool(mostRecentlyDuePool.address);
+                const readyForUpkeep = await keeperInstance.isUpkeepRequiredSinglePool(mostRecentlyDuePool.address);
 
-            if (!readyForUpkeep) {
-              // prevent getting stuck here if someone else upkeeps it
-              const lastPriceTimestamp = await mostRecentlyDuePool.contractInstance.lastPriceTimestamp();
-              if (lastPriceTimestamp.toNumber() > now) {
-                console.log(`[${nowFormatted()}] ${mostRecentlyDuePool.address} was upkept elsewhere`);
-                return;
+                if (!readyForUpkeep) {
+                  // retrying will be handled by attemptPromiseRecursively
+                  throw new Error(`[${nowFormatted()}] ${mostRecentlyDuePool.address} not ready for upkeep yet`);
+                }
               }
-              // attemptPromiseRecursively will retry after 1 second
-              throw new Error(`[${nowFormatted()}] ${mostRecentlyDuePool.address} not ready for upkeep yet`);
-            }
-          }
-        })
-          .then(() => {
+            });
+
+            // submit the upkeep transaction
             const poolsDueAddresses = poolsDue.map(({ address }) => address);
 
-            return attemptPromiseRecursively({
+            await attemptPromiseRecursively({
               promise: async () => {
                 const tx = poolsDueAddresses.length === 1
                   ? await keeperInstance.performUpkeepSinglePool(poolsDueAddresses[0], { gasLimit: this.gasLimit })
@@ -178,9 +176,8 @@ class Keeper {
                 await this.provider.waitForTransaction(tx.hash);
               }
             });
-          })
-          .then(() => {
-            // dont need to wait for this
+
+            // dont need to wait for this, the pools will eventually become available for upkeep again
             for (const { address, contractInstance } of poolsDue) {
               attemptPromiseRecursively({
                 label: `updating last price timestamp for pool ${address}`,
@@ -192,40 +189,41 @@ class Keeper {
                 .then(lastPriceTimestamp => {
                   const lastPriceTimestampNumber = lastPriceTimestamp.toNumber();
 
-                  this.watchedPools[address].isBusy = false;
                   this.watchedPools[address].nextUpkeepDue = lastPriceTimestampNumber + this.watchedPools[address].updateInterval;
                   this.watchedPools[address].lastPriceTimestamp = lastPriceTimestampNumber;
 
                   console.log(`[${nowFormatted()}] ${address} upkept at ${this.watchedPools[address].lastPriceTimestamp}, next due at ${this.watchedPools[address].nextUpkeepDue}`);
+                })
+                .finally(() => {
+                  this.watchedPools[address].isBusy = false;
+                  console.log(`[${nowFormatted()}] ${address} is no longer busy`);
                 });
             };
-            console.log(`[${nowFormatted()}] finished upkeep interval for keeper ${keeperAddress}`);
-          });
+          } catch (error: any) {
+            console.error(`[${nowFormatted()}] failed to process upkeeps for keeper ${keeperAddress}: ${error.message}`);
+          }
+        };
 
-        promises.push(processUpkeepForKeeper);
+        promises.push(processUpkeepForKeeper());
       }
 
-      Promise.all(promises)
+      Promise.allSettled(promises)
         .then(() => resolve(null))
-        .catch((error) => reject(error));
+        .catch(error => reject(error));
     });
   }
 
   startUpkeeping ({ interval }: { interval: number }) {
     console.log(`[${nowFormatted()}] starting upkeeping interval`);
 
-    try {
-      asyncInterval({
-        fn: async () => this.processDueUpkeeps.bind(this)(),
-        delayMs: interval,
-        runImmediately: true,
-        onError: (error) => {
-          console.error(`[${nowFormatted()}: asyncInterval] ${error.message}`);
-        }
-      });
-    } catch (error) {
-      console.error(error);
-    }
+    asyncInterval({
+      fn: async () => this.processDueUpkeeps(),
+      delayMs: interval,
+      runImmediately: true,
+      onError: (error) => {
+        console.error(`[${nowFormatted()}: asyncInterval] ${error.message}`);
+      }
+    });
   }
 
   startWatchingForNewPools () {

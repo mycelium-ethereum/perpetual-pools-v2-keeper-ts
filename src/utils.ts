@@ -1,18 +1,43 @@
+/**
+ * attempt promise until it succeeds or the maximum number of allowed attempts is reached
+ *
+ * @returns a promise that will eventually error or resolve to the same type as the original promise
+ */
 export const attemptPromiseRecursively = async <T>({
   promise,
+  retryCheck,
+  maxAttempts = 10,
   interval = 1000,
+  attemptCount = 1,
   label = 'error caught in attemptPromiseRecursively'
 }: {
-  promise: () => Promise<T>,
+  promise: () => Promise<T>
+  retryCheck?: (error: unknown) => Promise<boolean>
+  maxAttempts?: number
   interval?: number
+  attemptCount?: number
   label?: string
 }): Promise<T> => {
   try {
-    return await promise();
+    const result = await promise();
+    return result;
   } catch (error: any) {
     console.error(`[${nowFormatted()}: ${label}] ${error.message}`);
-    await new Promise(resolve => setTimeout(resolve, interval + 500));
-    return attemptPromiseRecursively({ promise, interval });
+
+    if (attemptCount >= maxAttempts) {
+      throw error;
+    }
+
+    // back off increasingly between attempts
+    const newInterval = interval + 500;
+
+    await new Promise(resolve => setTimeout(resolve, newInterval));
+
+    if (!retryCheck || (retryCheck && await retryCheck(error))) {
+      return attemptPromiseRecursively({ promise, retryCheck, interval: newInterval, maxAttempts, attemptCount: attemptCount + 1 });
+    } else {
+      throw error;
+    }
   }
 };
 
