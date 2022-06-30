@@ -158,7 +158,7 @@ class Keeper {
                 const readyForUpkeep = await keeperInstance.isUpkeepRequiredSinglePool(mostRecentlyDuePool.address);
 
                 if (!readyForUpkeep) {
-                  // retrying will be handled by attemptPromiseRecursively
+                // retrying will be handled by attemptPromiseRecursively
                   throw new Error(`[${nowFormatted()}] ${mostRecentlyDuePool.address} not ready for upkeep yet`);
                 }
               }
@@ -201,6 +201,11 @@ class Keeper {
             };
           } catch (error: any) {
             console.error(`[${nowFormatted()}] failed to process upkeeps for keeper ${keeperAddress}: ${error.message}`);
+
+            for (const { address } of poolsDue) {
+              this.watchedPools[address].isBusy = false;
+              console.log(`[${nowFormatted()}] abandoned upkeep on pool ${address}, it is no longer busy`);
+            }
           }
         };
 
