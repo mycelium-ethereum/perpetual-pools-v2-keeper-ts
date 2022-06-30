@@ -11,7 +11,7 @@ export const attemptPromiseRecursively = async <T>({
     return await promise();
   } catch (error: any) {
     console.error(`[${nowFormatted()}: ${label}] ${error.message}`);
-    await new Promise(resolve => setTimeout(resolve, interval + 200));
+    await new Promise(resolve => setTimeout(resolve, interval + 500));
     return attemptPromiseRecursively({ promise, interval });
   }
 };
