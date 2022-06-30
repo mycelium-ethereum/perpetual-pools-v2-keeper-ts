@@ -29,7 +29,7 @@ export const attemptPromiseRecursively = async <T>({
     }
 
     // back off increasingly between attempts
-    const newInterval = interval + 500;
+    const newInterval = interval + 100;
 
     await new Promise(resolve => setTimeout(resolve, newInterval));
 

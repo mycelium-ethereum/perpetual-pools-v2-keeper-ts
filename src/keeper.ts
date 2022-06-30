@@ -176,36 +176,26 @@ class Keeper {
                 await this.provider.waitForTransaction(tx.hash);
               }
             });
-
-            // dont need to wait for this, the pools will eventually become available for upkeep again
-            for (const { address, contractInstance } of poolsDue) {
-              attemptPromiseRecursively({
-                label: `updating last price timestamp for pool ${address}`,
-                promise: async () => {
-                  // fetch new lastPriceTimestamp
-                  return contractInstance.lastPriceTimestamp();
-                }
-              })
-                .then(lastPriceTimestamp => {
-                  const lastPriceTimestampNumber = lastPriceTimestamp.toNumber();
-
-                  this.watchedPools[address].nextUpkeepDue = lastPriceTimestampNumber + this.watchedPools[address].updateInterval;
-                  this.watchedPools[address].lastPriceTimestamp = lastPriceTimestampNumber;
-
-                  console.log(`[${nowFormatted()}] ${address} upkept at ${this.watchedPools[address].lastPriceTimestamp}, next due at ${this.watchedPools[address].nextUpkeepDue}`);
-                })
-                .finally(() => {
-                  this.watchedPools[address].isBusy = false;
-                  console.log(`[${nowFormatted()}] ${address} is no longer busy`);
-                });
-            };
           } catch (error: any) {
             console.error(`[${nowFormatted()}] failed to process upkeeps for keeper ${keeperAddress}: ${error.message}`);
+          } finally {
+            const timestampUpdates = poolsDue.map(async ({ address, contractInstance }) => {
+              const lastPriceTimestamp = await attemptPromiseRecursively({
+                label: `updating last price timestamp for pool ${address}`,
+                promise: () => contractInstance.lastPriceTimestamp()
+              });
 
-            for (const { address } of poolsDue) {
+              const lastPriceTimestampNumber = lastPriceTimestamp.toNumber();
+
+              this.watchedPools[address].nextUpkeepDue = lastPriceTimestampNumber + this.watchedPools[address].updateInterval;
+              this.watchedPools[address].lastPriceTimestamp = lastPriceTimestampNumber;
               this.watchedPools[address].isBusy = false;
-              console.log(`[${nowFormatted()}] abandoned upkeep on pool ${address}, it is no longer busy`);
-            }
+
+              console.log(`[${nowFormatted()}] ${address} upkept at ${this.watchedPools[address].lastPriceTimestamp}, next due at ${this.watchedPools[address].nextUpkeepDue}`);
+              console.log(`[${nowFormatted()}] ${address} is no longer busy`);
+            });
+
+            await Promise.all(timestampUpdates);
           }
         };
 
