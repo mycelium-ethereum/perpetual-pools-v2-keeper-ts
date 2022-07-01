@@ -10,7 +10,8 @@ async function main () {
     poolFactoryDeployedAtBlock: Number(process.env.POOL_FACTORY_DEPLOYED_AT_BLOCK || 0),
     nodeUrl: process.env.NODE_URL as string,
     skipPools: {},
-    gasLimit: Number(process.env.GAS_LIMIT || 5000000)
+    gasLimit: Number(process.env.GAS_LIMIT || 5000000),
+    balanceThresholds: JSON.parse(process.env.BALANCE_THRESHOLDS || '{}')
   });
 
   await keeper.syncKnownPools();

@@ -5,7 +5,8 @@ import {
   PoolKeeper,
   PoolKeeper__factory,
   PoolFactory__factory,
-  PoolFactory
+  PoolFactory,
+  ERC20__factory
 } from '@tracer-protocol/perpetual-pools-contracts/types';
 import { asyncInterval, attemptPromiseRecursively, nowFormatted } from './utils';
 
@@ -15,7 +16,8 @@ type KeeperConstructorArgs = {
   nodeUrl: string,
   privateKey: string,
   skipPools: { [poolAddress: string]: boolean },
-  gasLimit: number
+  gasLimit: number,
+  balanceThresholds: { [tokenAddress: string]: string }
 }
 
 type WatchedPool = {
@@ -25,7 +27,10 @@ type WatchedPool = {
   lastPriceTimestamp: number,
   contractInstance: LeveragedPool,
   nextUpkeepDue: number,
-  isBusy: boolean
+  isBusy: boolean,
+  settlementTokenAddress: string,
+  settlementTokenDecimals: number,
+  totalBalance: ethers.BigNumber
 }
 
 class Keeper {
@@ -37,6 +42,7 @@ class Keeper {
   keeperInstances: Record<string, PoolKeeper>
   scheduledUpkeeps: Record<string, Record<string, { pools: string[], upkeepPromise: Promise<void> }>>
   skipPools: Record<string, boolean>
+  balanceThresholds: Record<string, string>
   onChainTimestamp: number
   gasLimit: number
 
@@ -46,7 +52,8 @@ class Keeper {
     skipPools,
     gasLimit,
     poolFactoryAddress,
-    poolFactoryDeployedAtBlock
+    poolFactoryDeployedAtBlock,
+    balanceThresholds
   }: KeeperConstructorArgs) {
     this.provider = ethers.getDefaultProvider(nodeUrl);
     this.poolFactoryInstance = PoolFactory__factory.connect(poolFactoryAddress, this.provider);
@@ -58,6 +65,7 @@ class Keeper {
     this.scheduledUpkeeps = {};
     this.skipPools = skipPools;
     this.gasLimit = gasLimit;
+    this.balanceThresholds = balanceThresholds;
   }
 
   // fetch known pools from the factory and add them as watched pools
@@ -89,15 +97,23 @@ class Keeper {
         const [
           lastPriceTimestamp,
           updateInterval,
-          keeper
+          keeper,
+          balances,
+          settlementTokenAddress
         ] = await Promise.all([
           poolInstance.lastPriceTimestamp(),
           poolInstance.updateInterval(),
-          poolInstance.keeper()
+          poolInstance.keeper(),
+          poolInstance.balances(),
+          poolInstance.settlementToken()
         ]);
         const lastPriceTimestampNumber = lastPriceTimestamp.toNumber();
 
         const updateIntervalNumber = Number(updateInterval);
+
+        const settlementToken = ERC20__factory.connect(settlementTokenAddress, this.provider);
+
+        const settlementTokenDecimals = await settlementToken.decimals();
 
         this.watchedPools[poolAddress] = {
           address: poolAddress,
@@ -106,7 +122,10 @@ class Keeper {
           lastPriceTimestamp: lastPriceTimestampNumber,
           contractInstance: poolInstance,
           nextUpkeepDue: lastPriceTimestampNumber + updateIntervalNumber,
-          isBusy: false
+          isBusy: false,
+          settlementTokenAddress,
+          settlementTokenDecimals,
+          totalBalance: balances[0].add(balances[1])
         };
 
         if (!this.keeperInstances[keeper]) {
@@ -123,7 +142,23 @@ class Keeper {
       const now = Math.floor(Date.now() / 1000);
 
       for (const poolAddress in this.watchedPools) {
-        const { keeperAddress, nextUpkeepDue, isBusy } = this.watchedPools[poolAddress];
+        const {
+          keeperAddress,
+          nextUpkeepDue,
+          isBusy,
+          totalBalance,
+          settlementTokenAddress,
+          settlementTokenDecimals
+        } = this.watchedPools[poolAddress];
+
+        const lowBalanceThreshold = ethers.utils.parseUnits(
+          this.balanceThresholds[settlementTokenAddress] || '0', settlementTokenDecimals
+        );
+
+        // do not consider pools with balances too low
+        if (totalBalance.lt(lowBalanceThreshold)) {
+          continue;
+        }
 
         if (!isBusy && nextUpkeepDue <= now) {
           // mark watched pool as busy
@@ -185,14 +220,19 @@ class Keeper {
                 promise: () => contractInstance.lastPriceTimestamp()
               });
 
+              const balances = await attemptPromiseRecursively({
+                label: `updating total balances for pool ${address}`,
+                promise: () => contractInstance.balances()
+              });
+
               const lastPriceTimestampNumber = lastPriceTimestamp.toNumber();
 
+              this.watchedPools[address].totalBalance = balances[0].add(balances[1]);
               this.watchedPools[address].nextUpkeepDue = lastPriceTimestampNumber + this.watchedPools[address].updateInterval;
               this.watchedPools[address].lastPriceTimestamp = lastPriceTimestampNumber;
               this.watchedPools[address].isBusy = false;
 
-              console.log(`[${nowFormatted()}] ${address} upkept at ${this.watchedPools[address].lastPriceTimestamp}, next due at ${this.watchedPools[address].nextUpkeepDue}`);
-              console.log(`[${nowFormatted()}] ${address} is no longer busy`);
+              console.log(`[${nowFormatted()}] ${address} upkept at ${this.watchedPools[address].lastPriceTimestamp}, next due at ${this.watchedPools[address].nextUpkeepDue}. no longer busy`);
             });
 
             await Promise.all(timestampUpdates);
