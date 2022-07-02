@@ -16,6 +16,7 @@ type KeeperConstructorArgs = {
   nodeUrl: string,
   privateKey: string,
   skipPools: { [poolAddress: string]: boolean },
+  includePools: { [poolAddress: string]: boolean },
   gasLimit: number,
   balanceThresholds: { [tokenAddress: string]: string }
 }
@@ -42,6 +43,7 @@ class Keeper {
   keeperInstances: Record<string, PoolKeeper>
   scheduledUpkeeps: Record<string, Record<string, { pools: string[], upkeepPromise: Promise<void> }>>
   skipPools: Record<string, boolean>
+  includePools: Record<string, boolean>
   balanceThresholds: Record<string, string>
   onChainTimestamp: number
   gasLimit: number
@@ -50,6 +52,7 @@ class Keeper {
     nodeUrl,
     privateKey,
     skipPools,
+    includePools,
     gasLimit,
     poolFactoryAddress,
     poolFactoryDeployedAtBlock,
@@ -64,6 +67,7 @@ class Keeper {
     this.keeperInstances = {};
     this.scheduledUpkeeps = {};
     this.skipPools = skipPools;
+    this.includePools = includePools;
     this.gasLimit = gasLimit;
     this.balanceThresholds = balanceThresholds;
   }
@@ -74,17 +78,32 @@ class Keeper {
     // search logs for all DeployPool events
     // for each event, initialize the watched pool
 
-    const deployPoolEventsFilter = this.poolFactoryInstance.filters.DeployPool();
-
-    const deployPoolEvents = await this.poolFactoryInstance.queryFilter(
-      deployPoolEventsFilter,
-      this.poolFactoryDeployedAtBlock
-    );
-
-    for (const event of deployPoolEvents) {
-      if (!this.skipPools[ethers.utils.getAddress(event.args.pool)]) {
-        await this.initializeWatchedPool(event.args.pool);
+    // allows for fallback list of watched pools in case rpc fails to sync deployed pools
+    for (const poolAddress in this.includePools) {
+      if (!this.skipPools[ethers.utils.getAddress(poolAddress)]) {
+        await this.initializeWatchedPool(ethers.utils.getAddress(poolAddress));
       }
+    }
+
+    try {
+      const deployPoolEventsFilter = this.poolFactoryInstance.filters.DeployPool();
+
+      const deployPoolEvents = await this.poolFactoryInstance.queryFilter(
+        deployPoolEventsFilter,
+        this.poolFactoryDeployedAtBlock
+      );
+
+      for (const event of deployPoolEvents) {
+        // if we are already watching it or its flagged to skip, ignore it
+        const _poolAddress = ethers.utils.getAddress(event.args.pool);
+        if (this.watchedPools[_poolAddress] || this.skipPools[_poolAddress]) {
+          continue;
+        }
+
+        await this.initializeWatchedPool(_poolAddress);
+      }
+    } catch (error: any) {
+      console.error(`failed to sync known pools from deployment events: ${error.message}`);
     }
   }
 
